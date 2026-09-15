@@ -4,7 +4,7 @@ import { Mail, Package, Phone, Ruler } from 'lucide-react';
 
 import { WhatsAppLink } from '@/components/marketing/whatsapp-link';
 
-import { siteConfig } from '@/config/site';
+import { headlines, siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -23,10 +23,10 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <article>
-      <p className="label-caps">Contact</p>
-      <h1 className="mt-3 text-4xl">We are happy to help</h1>
+      <p className="label-wide text-muted-foreground">{headlines.contact.kicker}</p>
+      <h1 className="mt-3 text-4xl">{headlines.contact.title}</h1>
       <p className="mt-4 text-muted-foreground">
-        Real people read these. We reply within one working day.
+        {headlines.contact.description}
       </p>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
@@ -83,7 +83,7 @@ export default function ContactPage() {
               <span>
                 <span className="block text-sm">I want to return something</span>
                 <span className="block text-xs text-muted-foreground">
-                  30 days, unworn with tags. We send the return label.
+                  30 days, unworn with tags. We arrange the pickup.
                 </span>
               </span>
             </Link>

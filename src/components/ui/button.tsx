@@ -6,18 +6,26 @@ import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  [
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium',
+    // Motion is part of the control, not decoration: the press scale is the
+    // only instant feedback a shopper gets before the server responds.
+    'transition-[background-color,border-color,color,box-shadow,transform] duration-200 ease-[var(--ease-soft)]',
+    'active:scale-[0.97] active:duration-100',
+    'disabled:pointer-events-none disabled:opacity-50 disabled:active:scale-100',
+    '[&_svg]:pointer-events-none [&_svg]:shrink-0',
+  ].join(' '),
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        accent: 'bg-accent text-accent-foreground hover:bg-accent/90',
+        primary: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 hover:shadow-md',
+        accent: 'bg-accent text-accent-foreground shadow-xs hover:bg-accent/90 hover:shadow-md',
         outline:
-          'border border-border-strong bg-transparent hover:bg-surface-muted',
+          'border border-border-strong bg-transparent hover:border-primary hover:bg-surface-muted',
         ghost: 'hover:bg-surface-muted',
         link: 'text-foreground underline underline-offset-4 hover:text-accent',
         destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 hover:shadow-md',
       },
       size: {
         sm: 'h-9 px-3 text-xs [&_svg]:size-4',

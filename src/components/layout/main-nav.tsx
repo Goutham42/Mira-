@@ -28,18 +28,20 @@ export function MainNav() {
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'relative block py-1 text-sm transition-colors',
+                  'relative block py-1 text-sm transition-colors duration-200',
                   active ? 'text-primary' : 'text-foreground/75 hover:text-primary',
+                  // The sweep only applies to inactive items; the active one
+                  // keeps a permanent rule so the two never double up.
+                  !active && 'link-sweep',
                 )}
               >
                 {item.title}
-                <span
-                  aria-hidden
-                  className={cn(
-                    'absolute -bottom-0.5 left-0 h-px w-full origin-left bg-primary transition-transform duration-300',
-                    active ? 'scale-x-100' : 'scale-x-0',
-                  )}
-                />
+                {active ? (
+                  <span
+                    aria-hidden
+                    className="absolute -bottom-0.5 left-0 h-px w-full bg-primary"
+                  />
+                ) : null}
               </Link>
             </li>
           );

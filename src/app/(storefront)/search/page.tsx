@@ -5,6 +5,7 @@ import {
   type StorefrontSearchParams,
 } from '@/components/commerce/product-listing';
 import { SearchInput } from '@/components/commerce/search-input';
+import { SearchSuggestions } from '@/components/commerce/search-suggestions';
 
 export const metadata: Metadata = {
   title: 'Search',
@@ -33,10 +34,13 @@ export default async function SearchPage({
           heading={`Results for "${query}"`}
         />
       ) : (
-        <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <p className="text-muted-foreground">
-            Search for a piece by name, fabric or colour.
+            Search by garment, fabric or colour — or start with one of these.
           </p>
+          <div className="mt-8">
+            <SearchSuggestions />
+          </div>
         </div>
       )}
     </div>

@@ -9,7 +9,7 @@ const icons = { truck: Truck, shield: ShieldCheck, tag: Tag, pin: MapPin } as co
 
 export function AboutStrip() {
   return (
-    <section className="bg-surface-muted/70">
+    <section className="reveal relative overflow-hidden bg-gradient-to-br from-surface-muted via-surface-muted/80 to-mint/50">
       {/* Full-bleed on purpose: the photograph runs to the left edge of the
           viewport, and only the copy is held to the container gutter. */}
       <div className="grid lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)]">
@@ -37,10 +37,10 @@ export function AboutStrip() {
             </p>
             <Link
               href={aboutSection.cta.href}
-              className="mt-8 inline-flex items-center gap-3 rounded-full bg-primary py-2.5 pl-6 pr-2.5 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
+              className="btn-pill mt-8 inline-flex items-center gap-3 rounded-full bg-primary py-2.5 pl-6 pr-2.5 text-sm text-primary-foreground shadow-xs hover:bg-primary/90"
             >
               {aboutSection.cta.label}
-              <span className="grid size-7 place-items-center rounded-full bg-white/15">
+              <span className="btn-arrow grid size-7 place-items-center rounded-full bg-white/15">
                 <ArrowRight className="size-3.5" strokeWidth={1.8} aria-hidden />
               </span>
             </Link>
@@ -50,9 +50,9 @@ export function AboutStrip() {
             {assurances.map((item) => {
               const Icon = icons[item.icon];
               return (
-                <li key={item.title} className="flex items-start gap-4">
+                <li key={item.title} className="group flex items-start gap-4">
                   <Icon
-                    className="mt-0.5 size-6 shrink-0 text-foreground"
+                    className="mt-0.5 size-6 shrink-0 text-foreground transition-colors duration-300 group-hover:text-primary"
                     strokeWidth={1.3}
                     aria-hidden
                   />

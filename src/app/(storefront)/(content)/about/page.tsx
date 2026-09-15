@@ -2,59 +2,60 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { siteConfig } from '@/config/site';
+import { headlines, siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
-  title: 'Our story',
-  description:
-    'Mira makes a small, considered wardrobe of dresses and separates — cut well, made in small runs, priced honestly.',
+  title: headlines.about.title,
+  description: siteConfig.description,
   alternates: { canonical: '/about' },
 };
 
 export default function AboutPage() {
   return (
     <article>
-      <p className="label-caps">Our story</p>
-      <h1 className="mt-3 text-4xl">Fewer pieces, made properly</h1>
+      <p className="label-wide text-muted-foreground">{headlines.about.kicker}</p>
+      <h1 className="mt-3 text-4xl">{headlines.about.title}</h1>
 
       <div className="mt-8 space-y-5 leading-relaxed text-muted-foreground">
         <p>
-          {siteConfig.name} started from a simple frustration: it is surprisingly hard to
-          buy a dress that is cut well, made from a fabric that improves with wear, and
-          priced at what it actually costs to make.
+          {siteConfig.name} began the way most good shops do — with customers asking for
+          something the market kept getting wrong. Ethnic wear was either dressed up for
+          occasions nobody has every week, or cheap enough to fall apart by the third
+          wash. Very little of it was made for an ordinary Tuesday.
         </p>
         <p>
-          So we make a small number of pieces and make them carefully. Every style is
-          patterned in-house, sampled on real bodies across the full size range, and
-          produced in runs small enough that nothing sits in a warehouse for a season.
+          So we built the wardrobe around the days you actually have. Kurtis you can wear
+          to work and still be comfortable in at eight in the evening. Salwar sets that
+          hold their colour. Leggings, inners and inskirts that fit properly, because the
+          pieces nobody sees are the ones that decide how the rest sits.
         </p>
         <p>
-          We work in natural fibres — washed European linen, organic cotton poplin,
-          washable mulberry silk — because they age well. A dress you still reach for in
-          five years is the only kind worth making.
+          Everything is chosen for how it behaves after a month, not how it looks on a
+          hanger. We would rather sell you one kurti you keep reaching for than four you
+          tolerate.
         </p>
       </div>
 
       <section className="mt-14 grid gap-8 border-t pt-10 sm:grid-cols-3">
         <div>
-          <h2 className="font-display text-xl">Small runs</h2>
+          <h2 className="font-display text-xl">Fabric that lasts</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            We make what we expect to sell, not what fills a container. Less waste, and
-            styles we can actually stand behind.
+            Breathable cotton and cotton blends picked for Indian weather — they soften
+            with washing instead of thinning out.
           </p>
         </div>
         <div>
           <h2 className="font-display text-xl">Honest sizing</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Every style is fitted across the range, not graded up from a single sample.
-            Our size guide lists real body measurements.
+            Our size guide lists real body measurements, not vanity labels, so you can
+            order once and keep it.
           </p>
         </div>
         <div>
-          <h2 className="font-display text-xl">Natural fibres</h2>
+          <h2 className="font-display text-xl">A real shop</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Linen, cotton and silk, chosen because they soften and last rather than
-            because they are cheap to cut.
+            You can find us in {siteConfig.store.locality}. Come and feel the fabric
+            before you buy — or message us and we will send you a closer look.
           </p>
         </div>
       </section>

@@ -10,6 +10,12 @@
 
 generator client {
   provider = "prisma-client-js"
+
+  // `relationJoins` lets a query load its nested relations with a single
+  // LATERAL join instead of one round trip per relation. The catalogue card
+  // select is four levels deep, which cost six extra round trips per listing
+  // render — invisible against a local database, seconds against a remote one.
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {

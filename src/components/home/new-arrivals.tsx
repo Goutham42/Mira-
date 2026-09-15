@@ -21,7 +21,7 @@ export async function NewArrivals() {
   if (products.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+    <section className="reveal mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="label-wide text-muted-foreground">Just landed</p>
@@ -30,11 +30,11 @@ export async function NewArrivals() {
 
         <Link
           href="/shop?sort=newest"
-          className="group inline-flex shrink-0 items-center gap-2 pb-1 text-sm text-foreground/80 transition-colors hover:text-primary"
+          className="group link-sweep inline-flex shrink-0 items-center gap-2 pb-1 text-sm text-foreground/80 transition-colors duration-200 hover:text-primary"
         >
           View All
           <ArrowRight
-            className="size-4 transition-transform group-hover:translate-x-0.5"
+            className="size-4 transition-transform duration-300 ease-[var(--ease-spring)] group-hover:translate-x-1"
             strokeWidth={1.6}
             aria-hidden
           />

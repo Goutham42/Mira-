@@ -22,7 +22,7 @@ export function InstagramStrip() {
   });
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <section className="reveal mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="font-display text-3xl sm:text-[2rem]">Follow Us {handle}</h2>
 
@@ -33,7 +33,7 @@ export function InstagramStrip() {
             target="_blank"
             rel="noreferrer noopener"
             aria-label={`${siteConfig.name} on Instagram`}
-            className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground transition-opacity hover:opacity-90"
+            className="icon-action grid size-9 place-items-center rounded-md bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 hover:shadow-md"
           >
             <InstagramIcon className="size-4.5" />
           </a>
@@ -45,7 +45,7 @@ export function InstagramStrip() {
           tile.card ? (
             <li
               key="script-card"
-              className="flex aspect-square items-center justify-center rounded-sm bg-primary px-3 text-center"
+              className="flex aspect-square items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/85 px-3 text-center shadow-sm"
             >
               <p className="font-script text-xl leading-tight text-primary-foreground">
                 {instagramSection.cardLines.map((line) => (
@@ -62,7 +62,7 @@ export function InstagramStrip() {
                 alt={tile.alt}
                 label="Feed"
                 sizes="(min-width: 1024px) 12vw, (min-width: 640px) 25vw, 50vw"
-                className="aspect-square w-full rounded-sm"
+                className="hover-lift aspect-square w-full rounded-lg"
                 tone={position % 3 === 1 ? 'mint' : 'warm'}
               />
             </li>

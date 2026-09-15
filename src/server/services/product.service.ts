@@ -7,6 +7,7 @@ import { conflict, notFound } from '@/server/errors';
 import { requirePermission } from '@/server/auth/session';
 import { uniqueSlug } from '@/lib/slug';
 import { parsePageParams, paginate, type Paginated } from '@/lib/pagination';
+import { buildSearchTokens } from '@/lib/search-terms';
 import type { ProductInput } from '@/lib/validation/product';
 import type {
   CatalogFacets,
@@ -149,13 +150,37 @@ function buildProductWhere(params: ListProductsParams): Prisma.ProductWhereInput
   }
 
   if (params.q) {
-    and.push({
-      OR: [
-        { title: { contains: params.q, mode: 'insensitive' } },
-        { shortDescription: { contains: params.q, mode: 'insensitive' } },
-        { brand: { contains: params.q, mode: 'insensitive' } },
-      ],
-    });
+    /**
+     * Every word must match something, but each word may match any field and
+     * any of its synonyms — so "blue kurti" needs both, while "chudidhar"
+     * still finds a churidar and "tops" still finds a piece titled "Top".
+     */
+    for (const token of buildSearchTokens(params.q)) {
+      const alternatives: Prisma.ProductWhereInput[] = [];
+
+      for (const variant of token.variants) {
+        alternatives.push(
+          { title: { contains: variant, mode: 'insensitive' } },
+          { shortDescription: { contains: variant, mode: 'insensitive' } },
+          { description: { contains: variant, mode: 'insensitive' } },
+          { brand: { contains: variant, mode: 'insensitive' } },
+          { material: { contains: variant, mode: 'insensitive' } },
+          { category: { name: { contains: variant, mode: 'insensitive' } } },
+          {
+            variants: {
+              some: {
+                isActive: true,
+                optionValues: {
+                  some: { optionValue: { value: { contains: variant, mode: 'insensitive' } } },
+                },
+              },
+            },
+          },
+        );
+      }
+
+      and.push({ OR: alternatives });
+    }
   }
 
   // Each facet group is ANDed with the others but ORed within itself, which is
@@ -238,6 +263,8 @@ export async function listProducts(
       skip: page.skip,
       take: page.take,
       select: cardSelect,
+      // One joined query instead of a round trip per nested relation.
+      relationLoadStrategy: 'join',
     }),
     db.product.count({ where }),
   ]);
@@ -252,7 +279,7 @@ export async function listProducts(
  * list that collapses as you select from it is the classic way to trap someone
  * in a dead end with no visible way out.
  */
-export async function getCatalogFacets(categoryPath?: string): Promise<CatalogFacets> {
+async function loadCatalogFacets(categoryPath?: string): Promise<CatalogFacets> {
   const where = buildProductWhere({ categoryPath });
 
   const [optionValues, priceAggregate] = await Promise.all([
@@ -309,6 +336,22 @@ export async function getCatalogFacets(categoryPath?: string): Promise<CatalogFa
   };
 }
 
+/**
+ * Facets for the filter panel.
+ *
+ * Cached per category and tag-invalidated. The listing awaits this before it
+ * can render its shell, so on a deployment where the database is a region away
+ * these two queries were adding a full round trip to every listing view — and
+ * the answer only changes when an admin edits the catalogue.
+ */
+export function getCatalogFacets(categoryPath?: string): Promise<CatalogFacets> {
+  return unstable_cache(
+    () => loadCatalogFacets(categoryPath),
+    ['catalog-facets', categoryPath ?? 'all'],
+    { tags: [PRODUCT_TAG, CATEGORY_TAG], revalidate: 600 },
+  )();
+}
+
 const detailSelect = {
   id: true,
   slug: true,
@@ -359,6 +402,9 @@ async function loadProductDetail(slug: string): Promise<ProductDetailData | null
   const row = await db.product.findFirst({
     where: { slug, ...publicProductWhere },
     select: detailSelect,
+    // The detail select is deeper than the card one; without the join
+    // strategy it fans out into a round trip per relation.
+    relationLoadStrategy: 'join',
   });
   if (!row) return null;
 
@@ -439,6 +485,7 @@ export const getFeaturedProducts = unstable_cache(
       orderBy: [{ publishedAt: 'desc' }],
       take: limit,
       select: cardSelect,
+      relationLoadStrategy: 'join',
     });
     return withRatings(rows.map(toProductCard));
   },
@@ -453,6 +500,7 @@ export const getNewArrivals = unstable_cache(
       orderBy: [{ publishedAt: 'desc' }],
       take: limit,
       select: cardSelect,
+      relationLoadStrategy: 'join',
     });
     return withRatings(rows.map(toProductCard));
   },
@@ -471,6 +519,7 @@ export async function getRelatedProducts(
     orderBy: [{ isFeatured: 'desc' }, { publishedAt: 'desc' }],
     take: limit,
     select: cardSelect,
+    relationLoadStrategy: 'join',
   });
   return withRatings(rows.map(toProductCard));
 }

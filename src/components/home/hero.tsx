@@ -69,7 +69,7 @@ export function Hero() {
         {/* Wash from the left so the headline holds contrast over any photo. */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent"
+          className="absolute inset-0 bg-[linear-gradient(100deg,var(--background)_8%,rgb(251_248_243/0.72)_46%,transparent_78%)]"
         />
 
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
@@ -88,10 +88,10 @@ export function Hero() {
 
             <Link
               href={slide.cta.href}
-              className="mt-8 inline-flex items-center gap-3 rounded-full bg-primary py-3 pl-7 pr-3 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
+              className="btn-pill mt-8 inline-flex items-center gap-3 rounded-full bg-primary py-3 pl-7 pr-3 text-sm text-primary-foreground shadow-sm hover:bg-primary/90"
             >
               {slide.cta.label}
-              <span className="grid size-8 place-items-center rounded-full bg-white/15">
+              <span className="btn-arrow grid size-8 place-items-center rounded-full bg-white/15">
                 <ArrowRight className="size-4" strokeWidth={1.8} aria-hidden />
               </span>
             </Link>
@@ -125,7 +125,7 @@ export function Hero() {
                 aria-label={`Show slide ${i + 1}: ${item.title.join(' ')}`}
                 aria-current={i === index ? 'true' : undefined}
                 className={cn(
-                  'text-sm tabular-nums transition-colors',
+                  'text-sm tabular-nums transition-all duration-300 ease-[var(--ease-soft)] hover:-translate-y-0.5',
                   i === index
                     ? 'text-foreground'
                     : 'text-foreground/40 hover:text-foreground/70',

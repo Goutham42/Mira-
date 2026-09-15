@@ -4,6 +4,7 @@ import { SlidersHorizontal } from 'lucide-react';
 import { listProducts, getCatalogFacets } from '@/server/services/product.service';
 import { getWishlistProductIds } from '@/server/services/wishlist.service';
 import { ActiveFilters } from './active-filters';
+import { SearchSuggestions } from './search-suggestions';
 import { FilterPanel } from './filter-panel';
 import { MobileFilters } from './mobile-filters';
 import { Pagination } from './pagination';
@@ -66,11 +67,14 @@ async function Results({
 
   if (result.items.length === 0) {
     return (
-      <div className="py-20 text-center">
-        <p className="font-display text-xl">Nothing matches those filters</p>
+      <div className="py-16">
+        <p className="font-display text-2xl">Nothing matches that</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Try removing a filter, or browse the full collection.
+          Try removing a filter, or start from one of these.
         </p>
+        <div className="mt-8">
+          <SearchSuggestions heading="Try instead" />
+        </div>
       </div>
     );
   }

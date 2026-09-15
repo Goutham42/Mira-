@@ -3,8 +3,13 @@ import { clientEnv } from './env';
 export const siteConfig = {
   name: clientEnv.NEXT_PUBLIC_STORE_NAME,
   tagline: "Women's ethnic wear",
+  /**
+   * The meta description, and the fallback wherever a page has none. Kept
+   * under 160 characters so search engines show it whole, and concrete about
+   * what the shop sells rather than how it feels about itself.
+   */
   description:
-    'Ethnic wear that blends tradition with modern living — kurtis, salwar sets and everyday essentials, made to be comfortable and beautifully you.',
+    'Everyday ethnic wear for women — kurtis, salwar sets, nighties, leggings and inners. Comfortable fabrics, honest prices, from our store in Coimbatore.',
   url: clientEnv.NEXT_PUBLIC_APP_URL,
   currency: clientEnv.NEXT_PUBLIC_DEFAULT_CURRENCY,
   locale: 'en-IN',
@@ -30,6 +35,33 @@ export const siteConfig = {
     facebook: 'https://facebook.com',
     youtube: 'https://youtube.com',
     pinterest: 'https://pinterest.com',
+  },
+} as const;
+
+/**
+ * Page headlines.
+ *
+ * Collected here so the storefront's voice can be read — and changed — in one
+ * sitting, instead of being scattered across a dozen page components.
+ */
+export const headlines = {
+  shop: {
+    title: 'The whole collection',
+    description:
+      'Kurtis, salwar sets, nighties and the essentials that go under them — every piece we make, in one place.',
+  },
+  search: {
+    empty: 'Search by garment, fabric or colour',
+    noResults: 'Nothing matches that',
+  },
+  about: {
+    kicker: 'Our story',
+    title: 'Ethnic wear for the everyday',
+  },
+  contact: {
+    kicker: 'Contact',
+    title: 'We are happy to help',
+    description: 'Real people read these. We reply within one working day.',
   },
 } as const;
 

@@ -4,10 +4,11 @@ import {
   ProductListing,
   type StorefrontSearchParams,
 } from '@/components/commerce/product-listing';
+import { headlines } from '@/config/site';
 
 export const metadata: Metadata = {
-  title: 'Shop all',
-  description: 'Every piece in the Mira collection — dresses, tops and bottoms.',
+  title: headlines.shop.title,
+  description: headlines.shop.description,
 };
 
 export default async function ShopPage({
@@ -21,8 +22,8 @@ export default async function ShopPage({
     <ProductListing
       searchParams={params}
       basePath="/shop"
-      heading="Shop all"
-      description="Every piece in the collection, in one place."
+      heading={headlines.shop.title}
+      description={headlines.shop.description}
     />
   );
 }

@@ -36,7 +36,7 @@ function Sprig({ className }: { className?: string }) {
 
 export function WhyChoose() {
   return (
-    <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+    <section className="reveal mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
       <h2 className="font-display text-4xl sm:text-[2.75rem]">
         Why Choose {siteConfig.name}?
       </h2>
@@ -46,8 +46,15 @@ export function WhyChoose() {
           {reasons.map((reason) => {
             const Icon = icons[reason.icon];
             return (
-              <li key={reason.title} className="flex flex-col items-center text-center">
-                <Icon className="size-7 text-foreground" strokeWidth={1.3} aria-hidden />
+              <li
+                key={reason.title}
+                className="group flex flex-col items-center rounded-lg px-3 py-4 text-center transition-colors duration-300 hover:bg-surface-muted/60"
+              >
+                <Icon
+                  className="size-7 text-foreground transition-all duration-300 ease-[var(--ease-spring)] group-hover:-translate-y-0.5 group-hover:scale-110 group-hover:text-primary"
+                  strokeWidth={1.3}
+                  aria-hidden
+                />
                 <p className="mt-4 text-sm font-medium text-foreground">{reason.title}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{reason.description}</p>
               </li>

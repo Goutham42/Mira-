@@ -31,23 +31,23 @@ export const heroSlides: HeroSlide[] = [
   {
     eyebrow: 'Ethnic wear for',
     title: ['Everyday', 'Elegance'],
-    subtitle: 'Timeless styles for the modern you',
+    subtitle: 'Kurtis and salwar sets you can live in, all day',
     cta: { label: 'Shop New Arrivals', href: '/shop?sort=newest' },
     image: null,
     alt: 'Model wearing a printed kurti with a teal dupatta',
   },
   {
-    eyebrow: 'Handpicked for',
+    eyebrow: 'Made for',
     title: ['Effortless', 'Comfort'],
-    subtitle: 'Soft fabrics that move the way you do',
+    subtitle: 'Breathable cotton that softens with every wash',
     cta: { label: 'Shop Kurtis', href: '/shop' },
     image: null,
     alt: 'Model in a pastel salwar set',
   },
   {
-    eyebrow: 'Made for',
+    eyebrow: 'Dressed for',
     title: ['Every', 'Occasion'],
-    subtitle: 'From morning errands to evening celebrations',
+    subtitle: 'From the school run to the family function',
     cta: { label: 'Explore Collections', href: '/shop' },
     image: null,
     alt: 'Model in a festive embroidered kurta set',
@@ -81,26 +81,26 @@ export type FeaturedCollection = {
 export const featuredCollections: FeaturedCollection[] = [
   {
     name: 'Kurtis',
-    caption: 'Everyday Chic',
+    caption: 'Work, weekend, everything between',
     image: null,
     alt: 'Model in a pink embroidered kurti',
   },
   {
     name: 'Salwar Sets',
-    caption: 'Grace in Every Step',
+    caption: 'Set and ready, no thinking required',
     image: null,
     alt: 'Model in a teal salwar set',
   },
   {
     name: 'Nighties',
-    caption: 'Comfort All Day',
+    caption: 'The softest thing you own',
     image: null,
     alt: 'Model in a maroon printed nightie',
   },
 ];
 
 export const collectionPromo = {
-  headline: ['Thoughtfully', 'curated for your', 'everyday moments'],
+  headline: ['Chosen for how', 'they feel on', 'the fiftieth wear'],
   cta: { label: 'Explore Now', href: '/shop' },
   image: null as string | null,
   alt: 'Stack of folded printed fabrics',
@@ -113,27 +113,27 @@ export type Reason = {
 };
 
 export const reasons: Reason[] = [
-  { icon: 'leaf', title: 'Quality Fabrics', description: 'Feels good, lasts long' },
-  { icon: 'heart', title: 'Everyday Comfort', description: 'Wear it. Live in it.' },
-  { icon: 'gem', title: 'Trendy & Timeless', description: 'Classic with a modern touch' },
+  { icon: 'leaf', title: 'Fabric that lasts', description: 'Softens with washing, never thins' },
+  { icon: 'heart', title: 'Made for all day', description: 'Comfortable at 9am and at 9pm' },
+  { icon: 'gem', title: 'Quietly current', description: 'Traditional cuts, nothing dated' },
   {
     icon: 'users',
-    title: 'Loved by many',
+    title: 'Bought again and again',
     description: `A growing ${siteConfig.name} family`,
   },
 ];
 
 export const reasonQuote = {
   lines: ['“More than outfits,', 'it’s a feeling.”'],
-  attribution: 'For the woman in every you.',
+  attribution: 'Made for the woman you already are.',
 };
 
 export const aboutSection = {
   kicker: 'About',
-  title: ['Celebrating', 'You, Every Day'],
+  title: ['Made for', 'Ordinary Days'],
   /** Rendered after an "At <store name>," lead-in, hence the lowercase start. */
   body:
-    'we bring you ethnic wear that blends tradition with modern living. From everyday essentials to special occasions, our collections are designed to make you feel confident, comfortable and beautifully you.',
+    'we make ethnic wear for the days you actually have — not the two a year that need an occasion. Kurtis, salwar sets and the essentials underneath, chosen for how they behave after a month of wearing, and priced so buying another is never a decision.',
   cta: { label: 'Our Story', href: '/about' },
   image: null as string | null,
   alt: 'Woman in an ethnic set holding a bunch of flowers',
@@ -146,9 +146,9 @@ export type Assurance = {
 };
 
 export const assurances: Assurance[] = [
-  { icon: 'truck', title: 'Easy Shopping', description: 'Hassle-free experience' },
-  { icon: 'shield', title: 'Trusted Quality', description: 'Only the best for you' },
-  { icon: 'tag', title: 'Styles for Every Woman', description: 'From everyday to special days' },
+  { icon: 'truck', title: 'Delivered to your door', description: 'Across India, tracked end to end' },
+  { icon: 'shield', title: 'Checked before it ships', description: 'Every piece, by hand' },
+  { icon: 'tag', title: 'Sized honestly', description: 'Real measurements, no guesswork' },
   {
     icon: 'pin',
     title: siteConfig.store.label,
@@ -157,7 +157,7 @@ export const assurances: Assurance[] = [
 ];
 
 export const instagramSection = {
-  tagline: 'Real Women. Real Style.',
+  tagline: 'Real women. Real wardrobes.',
   /** The teal card sits in place of a photo at this index. */
   cardIndex: 6,
   cardLines: ['Good', 'Outfits', 'Brighter', 'Days'],

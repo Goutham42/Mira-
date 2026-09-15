@@ -28,7 +28,7 @@ export function ProductCard({
 }) {
   return (
     <article className="group relative">
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md bg-surface-muted">
+      <div className="hover-lift relative aspect-[3/4] w-full overflow-hidden rounded-lg border border-transparent bg-surface-muted group-hover:border-border">
         {product.imageUrl ? (
           <>
             <Image
@@ -39,6 +39,9 @@ export function ProductCard({
               sizes="(min-width: 1280px) 20vw, (min-width: 768px) 33vw, 50vw"
               className={cn(
                 'object-cover transition-opacity duration-500',
+                // Only zoom when there is no second shot to cross-fade to;
+                // doing both at once reads as a glitch.
+                !product.hoverImageUrl && 'media-zoom',
                 product.hoverImageUrl && 'group-hover:opacity-0',
                 product.isSoldOut && 'opacity-60',
               )}
@@ -84,7 +87,10 @@ export function ProductCard({
         <h3 className="font-sans text-sm font-normal leading-snug tracking-normal">
           {/* Stretched link: the card is the hit area, but only the title is
               announced as the link target. */}
-          <Link href={`/p/${product.slug}`} className="after:absolute after:inset-0">
+          <Link
+            href={`/p/${product.slug}`}
+            className="transition-colors after:absolute after:inset-0 group-hover:text-primary"
+          >
             {product.title}
           </Link>
         </h3>

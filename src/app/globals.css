@@ -44,6 +44,21 @@
   --destructive-foreground: oklch(0.99 0 0);
 
   --radius: 0.25rem;
+
+  /* Motion. One easing vocabulary across the site: `soft` for anything that
+     settles into place, `spring` for a control acknowledging a press. */
+  --motion-ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --motion-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --duration-slow: 520ms;
+
+  /* Elevation. Warm-tinted rather than neutral grey — a pure black shadow
+     reads as dirt against a cream ground. */
+  --elevation-xs: 0 1px 2px rgb(61 46 28 / 0.05);
+  --elevation-sm: 0 2px 6px rgb(61 46 28 / 0.06), 0 1px 2px rgb(61 46 28 / 0.04);
+  --elevation-md: 0 8px 20px -6px rgb(61 46 28 / 0.12), 0 2px 6px rgb(61 46 28 / 0.06);
+  --elevation-lg: 0 20px 40px -12px rgb(61 46 28 / 0.18), 0 4px 10px rgb(61 46 28 / 0.06);
 }
 
 @theme inline {
@@ -83,6 +98,14 @@
 
   --tracking-display: -0.015em;
   --tracking-label: 0.08em;
+
+  --ease-soft: var(--motion-ease-soft);
+  --ease-spring: var(--motion-ease-spring);
+
+  --shadow-xs: var(--elevation-xs);
+  --shadow-sm: var(--elevation-sm);
+  --shadow-md: var(--elevation-md);
+  --shadow-lg: var(--elevation-lg);
 }
 
 @layer base {
@@ -114,6 +137,13 @@
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Headlines read better when the last line is not a single orphaned word. */
+  h1,
+  h2 {
+    text-wrap: balance;
   }
 
   /* Let long product titles and SKUs break rather than overflow. */
@@ -275,5 +305,135 @@
 
   .mira-rise {
     animation: mira-rise-in 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+}
+
+/**
+ * Interaction vocabulary.
+ *
+ * Written once here rather than as ad-hoc utility strings on every component,
+ * so hover and motion behave identically across the storefront and can be
+ * retuned in one place. Everything below is disabled by the reduced-motion
+ * block above.
+ */
+@layer components {
+  /* Cards and tiles that rise slightly toward the pointer. */
+  .hover-lift {
+    transition:
+      transform var(--duration-base) var(--motion-ease-soft),
+      box-shadow var(--duration-base) var(--motion-ease-soft),
+      border-color var(--duration-base) var(--motion-ease-soft);
+  }
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--elevation-md);
+  }
+  .hover-lift:active {
+    transform: translateY(-1px);
+    transition-duration: var(--duration-fast);
+  }
+
+  /* Photography inside a `group` container. */
+  .media-zoom {
+    transition: transform var(--duration-slow) var(--motion-ease-soft);
+    will-change: transform;
+  }
+  .group:hover .media-zoom {
+    transform: scale(1.06);
+  }
+
+  /**
+   * Underline that sweeps out from the left instead of appearing at once.
+   * Uses a pseudo-element rather than text-decoration so it can animate.
+   */
+  .link-sweep {
+    position: relative;
+  }
+  .link-sweep::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--duration-base) var(--motion-ease-soft);
+  }
+  .link-sweep:hover::after,
+  .link-sweep:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* Pill buttons: the arrow nudges forward, the surface deepens. */
+  .btn-pill {
+    transition:
+      background-color var(--duration-base) var(--motion-ease-soft),
+      box-shadow var(--duration-base) var(--motion-ease-soft),
+      transform var(--duration-fast) var(--motion-ease-spring);
+  }
+  .btn-pill:hover {
+    box-shadow: var(--elevation-md);
+  }
+  .btn-pill:active {
+    transform: scale(0.97);
+  }
+  .btn-pill .btn-arrow {
+    transition: transform var(--duration-base) var(--motion-ease-spring);
+  }
+  .btn-pill:hover .btn-arrow {
+    transform: translateX(3px);
+  }
+
+  /* Icon buttons in the header and rails. */
+  .icon-action {
+    transition:
+      background-color var(--duration-fast) var(--motion-ease-soft),
+      color var(--duration-fast) var(--motion-ease-soft),
+      transform var(--duration-fast) var(--motion-ease-spring);
+  }
+  .icon-action:hover {
+    transform: translateY(-1px);
+  }
+  .icon-action:active {
+    transform: scale(0.92);
+  }
+
+  /**
+   * Scroll reveal, CSS only.
+   *
+   * `animation-timeline: view()` drives this from scroll position with no
+   * JavaScript and no observer. Browsers without support simply never apply
+   * the animation and the content is visible from the start, which is why the
+   * default state is opaque rather than hidden — a JS-free fallback must never
+   * leave the page blank.
+   */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: mira-reveal linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 28%;
+      }
+    }
+  }
+}
+
+@keyframes mira-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Smooth in-page jumps (the product page's "reviews" anchor). */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
 }

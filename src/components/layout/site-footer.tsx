@@ -79,7 +79,7 @@ export function SiteFooter() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-primary-foreground/70 transition-colors hover:text-primary-foreground"
+                      className="link-sweep inline-block text-sm text-primary-foreground/70 transition-colors duration-200 hover:text-primary-foreground"
                     >
                       {link.title}
                     </Link>
@@ -100,7 +100,7 @@ export function SiteFooter() {
                       target="_blank"
                       rel="noreferrer noopener"
                       aria-label={label}
-                      className="grid size-9 place-items-center rounded-full border border-primary-foreground/25 text-primary-foreground/85 transition-colors hover:border-primary-foreground hover:text-primary-foreground"
+                      className="icon-action grid size-9 place-items-center rounded-full border border-primary-foreground/25 text-primary-foreground/85 hover:border-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
                     >
                       <Icon className="size-4" />
                     </a>
