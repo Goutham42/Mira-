@@ -10,26 +10,32 @@
 
 :root {
   /* Surfaces — warm paper, not clinical white. */
-  --background: oklch(0.985 0.005 85);
-  --surface: oklch(1 0 0);
-  --surface-muted: oklch(0.965 0.008 80);
+  --background: #fbf8f3;
+  --surface: #ffffff;
+  --surface-muted: #f4efe6;
+  /* Pale mint band behind the category rail and the about strip. */
+  --mint: #e3f0eb;
 
   /* Ink */
-  --foreground: oklch(0.22 0.008 60);
-  --muted-foreground: oklch(0.52 0.012 65);
-  --subtle-foreground: oklch(0.63 0.01 65);
+  --foreground: #2a2a26;
+  --muted-foreground: #5f5f57;
+  --subtle-foreground: #8b8b80;
 
   /* Lines */
-  --border: oklch(0.905 0.008 75);
-  --border-strong: oklch(0.82 0.01 75);
-  --ring: oklch(0.55 0.09 40);
+  --border: #e6dfd3;
+  --border-strong: #cfc6b6;
+  --ring: #0f544c;
 
-  /* Brand — a muted clay that reads as considered rather than loud. */
-  --primary: oklch(0.26 0.012 55);
-  --primary-foreground: oklch(0.985 0.005 85);
-  --accent: oklch(0.58 0.095 38);
-  --accent-foreground: oklch(0.99 0.004 85);
-  --accent-soft: oklch(0.94 0.025 40);
+  /* Brand — a deep ethnic teal, used for type, buttons and the footer. */
+  --primary: #0f544c;
+  --primary-foreground: #fbf8f3;
+  --accent: #0f544c;
+  --accent-foreground: #fbf8f3;
+  --accent-soft: #d7e8e2;
+
+  /* Near-black, for the secondary "Explore Now" style of button. */
+  --ink: #1d1d1b;
+  --ink-foreground: #fbf8f3;
 
   /* Feedback */
   --success: oklch(0.52 0.09 155);
@@ -44,6 +50,7 @@
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
+  --color-mint: var(--mint);
 
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
@@ -58,6 +65,8 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-soft: var(--accent-soft);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
 
   --color-success: var(--success);
   --color-warning: var(--warning);
@@ -66,6 +75,7 @@
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
+  --font-script: var(--font-script-hand), var(--font-display-serif), cursive;
 
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: var(--radius);
@@ -123,6 +133,19 @@
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--muted-foreground);
+  }
+
+  /* Wide-tracked caps used across the homepage: hero eyebrow, the
+     TRADITION / COMFORT / CONFIDENCE stack, section kickers. */
+  .label-wide {
+    font-size: 0.6875rem;
+    line-height: 1.1rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  .font-script {
+    font-family: var(--font-script);
   }
 }
 
@@ -207,6 +230,14 @@
   }
 }
 
+/* Hero copy swap between carousel slides. */
+@keyframes mira-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
 @layer components {
   .mira-overlay[data-state='open'] {
     animation: mira-fade-in 200ms ease-out;
@@ -241,5 +272,9 @@
   }
   .mira-pop[data-state='closed'] {
     animation: mira-pop-out 140ms ease-in;
+  }
+
+  .mira-rise {
+    animation: mira-rise-in 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
   }
 }

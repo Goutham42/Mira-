@@ -1,13 +1,15 @@
 import Link from 'next/link';
-import { Search, User } from 'lucide-react';
+import { ArrowRight, Heart, Search, User } from 'lucide-react';
 
-import { mainNav, siteConfig } from '@/config/site';
+import { siteConfig } from '@/config/site';
 import { getCartView } from '@/server/services/cart.service';
 import { getCategoryTree } from '@/server/services/category.service';
 import { getCurrentUser } from '@/server/auth/session';
 import { isStaff } from '@/server/auth/rbac';
 import { CartDrawer } from '@/components/commerce/cart-drawer';
+import { Logo } from '@/components/brand/logo';
 import { AccountMenu } from './account-menu';
+import { MainNav } from './main-nav';
 import { MobileNav } from './mobile-nav';
 
 /**
@@ -26,37 +28,36 @@ export async function SiteHeader() {
   ]);
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/95 backdrop-blur-md">
+      <div className="mx-auto flex h-18 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:h-20 lg:px-8">
         <MobileNav categories={categories} />
 
-        <Link href="/" className="mr-6 shrink-0 font-display text-2xl tracking-tight">
-          {siteConfig.name}
+        <Link href="/" className="shrink-0" aria-label={`${siteConfig.name} — home`}>
+          <Logo name={siteConfig.name} tagline={siteConfig.tagline} />
         </Link>
 
-        <nav aria-label="Main" className="hidden md:block">
-          <ul className="flex items-center gap-6">
-            {mainNav.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {item.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <div className="flex flex-1 justify-center">
+          <MainNav />
+        </div>
 
-        <div className="ml-auto flex items-center gap-0.5">
+        <div className="flex items-center gap-1">
           <Link
             href="/search"
-            className="inline-flex items-center justify-center rounded-md p-2 transition-colors hover:bg-surface-muted"
+            className="inline-flex items-center justify-center rounded-full p-2.5 text-foreground/80 transition-colors hover:bg-surface-muted hover:text-primary"
             aria-label="Search"
           >
-            <Search className="size-5" />
+            <Search className="size-5" strokeWidth={1.6} />
           </Link>
+
+          <Link
+            href="/account/wishlist"
+            className="hidden items-center justify-center rounded-full p-2.5 text-foreground/80 transition-colors hover:bg-surface-muted hover:text-primary sm:inline-flex"
+            aria-label="Wishlist"
+          >
+            <Heart className="size-5" strokeWidth={1.6} />
+          </Link>
+
+          <CartDrawer cart={cart} />
 
           {user ? (
             <AccountMenu
@@ -67,14 +68,22 @@ export async function SiteHeader() {
           ) : (
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-md p-2 transition-colors hover:bg-surface-muted"
+              className="inline-flex items-center justify-center rounded-full p-2.5 text-foreground/80 transition-colors hover:bg-surface-muted hover:text-primary lg:hidden"
               aria-label="Sign in"
             >
-              <User className="size-5" />
+              <User className="size-5" strokeWidth={1.6} />
             </Link>
           )}
 
-          <CartDrawer cart={cart} />
+          <Link
+            href="/shop"
+            className="ml-2 hidden items-center gap-2 rounded-full bg-primary py-2.5 pl-6 pr-2.5 text-sm text-primary-foreground transition-colors hover:bg-primary/90 lg:inline-flex"
+          >
+            Shop Now
+            <span className="grid size-7 place-items-center rounded-full bg-white/15">
+              <ArrowRight className="size-3.5" strokeWidth={1.8} aria-hidden />
+            </span>
+          </Link>
         </div>
       </div>
     </header>

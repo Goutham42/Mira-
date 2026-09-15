@@ -24,15 +24,18 @@ export function CartDrawer({ cart }: { cart: CartView }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
-        className="relative inline-flex items-center justify-center rounded-md p-2 transition-colors hover:bg-surface-muted"
+        className="relative inline-flex items-center justify-center rounded-full p-2.5 text-foreground/80 transition-colors hover:bg-surface-muted hover:text-primary"
         aria-label={`Open bag, ${cart.itemCount} item${cart.itemCount === 1 ? '' : 's'}`}
       >
-        <ShoppingBag className="size-5" />
-        {cart.itemCount > 0 ? (
-          <span className="absolute -right-0.5 -top-0.5 flex size-4.5 items-center justify-center rounded-full bg-accent text-[0.625rem] font-medium text-accent-foreground">
-            {cart.itemCount > 9 ? '9+' : cart.itemCount}
-          </span>
-        ) : null}
+        <ShoppingBag className="size-5" strokeWidth={1.6} />
+        {/* Always rendered, zero included — the count doubles as the "you have
+            a bag" affordance and the header reserves the space either way. */}
+        <span
+          aria-hidden
+          className="absolute right-0.5 top-0.5 flex size-4.5 items-center justify-center rounded-full bg-primary text-[0.625rem] font-medium text-primary-foreground"
+        >
+          {cart.itemCount > 9 ? '9+' : cart.itemCount}
+        </span>
       </SheetTrigger>
 
       <SheetContent side="right" title="Your bag" description="Items in your shopping bag">

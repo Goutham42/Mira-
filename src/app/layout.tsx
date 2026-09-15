@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Cormorant_Garamond } from 'next/font/google';
+import { Inter, Cormorant_Garamond, Dancing_Script } from 'next/font/google';
 import { Toaster } from 'sonner';
 
 import { siteConfig } from '@/config/site';
@@ -16,6 +16,15 @@ const displaySerif = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-display-serif',
+  display: 'swap',
+});
+
+// Used only for the handwritten accents — the hero's "Style Your Story", the
+// pull quote, and the Instagram tile. Kept to a single weight for that reason.
+const scriptHand = Dancing_Script({
+  subsets: ['latin'],
+  weight: ['500'],
+  variable: '--font-script-hand',
   display: 'swap',
 });
 
@@ -46,14 +55,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#FBF9F6',
+  themeColor: '#fbf8f3',
   width: 'device-width',
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={cn(inter.variable, displaySerif.variable)}>
+    <html lang="en" className={cn(inter.variable, displaySerif.variable, scriptHand.variable)}>
       <body className="min-h-dvh antialiased">
         <a
           href="#main"

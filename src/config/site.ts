@@ -2,9 +2,9 @@ import { clientEnv } from './env';
 
 export const siteConfig = {
   name: clientEnv.NEXT_PUBLIC_STORE_NAME,
-  tagline: 'Dresses made to be lived in',
+  tagline: "Women's ethnic wear",
   description:
-    'Mira is a considered wardrobe of dresses and separates — cut well, made to last, and priced honestly.',
+    'Ethnic wear that blends tradition with modern living — kurtis, salwar sets and everyday essentials, made to be comfortable and beautifully you.',
   url: clientEnv.NEXT_PUBLIC_APP_URL,
   currency: clientEnv.NEXT_PUBLIC_DEFAULT_CURRENCY,
   locale: 'en-IN',
@@ -12,45 +12,42 @@ export const siteConfig = {
     email: 'support@mira.example',
     phone: '+91 80000 00000',
   },
+  store: {
+    label: 'Visit Our Store',
+    locality: 'Vellalore, Coimbatore',
+  },
   social: {
     instagram: 'https://instagram.com',
+    facebook: 'https://facebook.com',
+    youtube: 'https://youtube.com',
     pinterest: 'https://pinterest.com',
   },
 } as const;
 
 export const mainNav = [
-  { title: 'New In', href: '/shop?sort=newest' },
-  { title: 'Dresses', href: '/c/dresses' },
-  { title: 'Tops', href: '/c/tops' },
-  { title: 'Bottoms', href: '/c/bottoms' },
-  { title: 'Shop All', href: '/shop' },
+  { title: 'Home', href: '/' },
+  { title: 'Collections', href: '/shop' },
+  { title: 'About', href: '/about' },
+  { title: 'Contact', href: '/contact' },
 ] as const;
 
 export const footerNav = [
   {
-    title: 'Shop',
+    title: 'Quick Links',
     links: [
-      { title: 'All Products', href: '/shop' },
-      { title: 'Dresses', href: '/c/dresses' },
-      { title: 'Tops', href: '/c/tops' },
-      { title: 'Bottoms', href: '/c/bottoms' },
+      { title: 'Home', href: '/' },
+      { title: 'Collections', href: '/shop' },
+      { title: 'About Us', href: '/about' },
+      { title: 'Contact', href: '/contact' },
     ],
   },
   {
-    title: 'Help',
+    title: 'Customer Care',
     links: [
-      { title: 'Contact', href: '/contact' },
+      { title: 'FAQs', href: '/contact' },
       { title: 'Shipping & Returns', href: '/legal/shipping-returns' },
       { title: 'Size Guide', href: '/legal/size-guide' },
-      { title: 'Track Order', href: '/account/orders' },
-    ],
-  },
-  {
-    title: 'About',
-    links: [
-      { title: 'Our Story', href: '/about' },
-      { title: 'Privacy Policy', href: '/legal/privacy' },
-      { title: 'Terms of Service', href: '/legal/terms' },
+      { title: 'Track Your Order', href: '/account/orders' },
     ],
   },
 ] as const;
