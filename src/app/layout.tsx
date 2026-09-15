@@ -1,14 +1,18 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Cormorant_Garamond, Dancing_Script } from 'next/font/google';
+import { Poppins, Cormorant_Garamond, Sacramento } from 'next/font/google';
 import { Toaster } from 'sonner';
 
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 import './globals.css';
 
-const inter = Inter({
+// Geometric sans — the wordmark, navigation and body copy in the design all
+// use circular, single-storey letterforms, which a grotesque like Inter cannot
+// reproduce. Poppins is the closest widely available match.
+const sans = Poppins({
   subsets: ['latin'],
-  variable: '--font-inter',
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-sans-geometric',
   display: 'swap',
 });
 
@@ -20,10 +24,11 @@ const displaySerif = Cormorant_Garamond({
 });
 
 // Used only for the handwritten accents — the hero's "Style Your Story", the
-// pull quote, and the Instagram tile. Kept to a single weight for that reason.
-const scriptHand = Dancing_Script({
+// pull quote, and the Instagram tile. Sacramento over a bouncier script like
+// Dancing Script because the design's hand is thin and monoline.
+const scriptHand = Sacramento({
   subsets: ['latin'],
-  weight: ['500'],
+  weight: ['400'],
   variable: '--font-script-hand',
   display: 'swap',
 });
@@ -62,7 +67,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={cn(inter.variable, displaySerif.variable, scriptHand.variable)}>
+    <html lang="en" className={cn(sans.variable, displaySerif.variable, scriptHand.variable)}>
       <body className="min-h-dvh antialiased">
         <a
           href="#main"

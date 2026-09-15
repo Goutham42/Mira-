@@ -73,7 +73,7 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-geometric), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
   --font-script: var(--font-script-hand), var(--font-display-serif), cursive;
 
@@ -98,7 +98,6 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
-    font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -108,7 +107,7 @@
   h3 {
     font-family: var(--font-display);
     letter-spacing: var(--tracking-display);
-    font-weight: 400;
+    font-weight: 500;
   }
 
   /* Visible, consistent focus. Never remove this without a replacement. */
