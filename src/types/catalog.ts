@@ -19,6 +19,8 @@ export type ProductCardData = {
   colors: { value: string; hexColor: string | null }[];
   isSoldOut: boolean;
   isNew: boolean;
+  /** Null when the product has no approved reviews yet. */
+  rating: { average: number; count: number } | null;
 };
 
 export type ProductOptionValueData = {
@@ -75,6 +77,32 @@ export type ProductDetailData = {
   variants: ProductVariantData[];
   isSoldOut: boolean;
   rating: { average: number; count: number } | null;
+};
+
+export type ProductReviewData = {
+  id: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  /** First name only — a storefront never exposes a reviewer's full identity. */
+  authorName: string;
+  verifiedPurchase: boolean;
+  createdAt: Date;
+};
+
+export type ReviewSummaryData = {
+  average: number;
+  count: number;
+  /** Review count per star, indexed 1-5. */
+  distribution: Record<1 | 2 | 3 | 4 | 5, number>;
+};
+
+/** What the signed-in shopper is allowed to do on a product's review form. */
+export type ReviewEligibility = {
+  canReview: boolean;
+  reason: 'OK' | 'NOT_SIGNED_IN' | 'ALREADY_REVIEWED' | 'NOT_PURCHASED';
+  /** Their own review, whatever its moderation status. */
+  existing: { rating: number; title: string | null; body: string; status: string } | null;
 };
 
 export type CategoryNode = {

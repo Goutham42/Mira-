@@ -3,6 +3,7 @@ import { SlidersHorizontal } from 'lucide-react';
 
 import { listProducts, getCatalogFacets } from '@/server/services/product.service';
 import { getWishlistProductIds } from '@/server/services/wishlist.service';
+import { ActiveFilters } from './active-filters';
 import { FilterPanel } from './filter-panel';
 import { MobileFilters } from './mobile-filters';
 import { Pagination } from './pagination';
@@ -76,8 +77,14 @@ async function Results({
 
   return (
     <>
-      <p className="sr-only" aria-live="polite">
-        {result.total} product{result.total === 1 ? '' : 's'} found
+      <p className="mb-6 text-sm text-muted-foreground" aria-live="polite">
+        {result.total} product{result.total === 1 ? '' : 's'}
+        {result.totalPages > 1 ? (
+          <span className="text-subtle-foreground">
+            {' '}
+            · page {result.page} of {result.totalPages}
+          </span>
+        ) : null}
       </p>
 
       <ProductGrid products={result.items} wishlistProductIds={wishlistIds} />
@@ -139,6 +146,10 @@ export async function ProductListing({
         <div className="ml-auto">
           <SortSelect value={params.sort} />
         </div>
+      </div>
+
+      <div className="mt-5 empty:mt-0">
+        <ActiveFilters />
       </div>
 
       <div className="mt-8 flex gap-10">

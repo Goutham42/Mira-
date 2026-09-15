@@ -2,7 +2,9 @@
 
 import { useMemo, useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { ShieldCheck, Truck } from 'lucide-react';
+import { Ruler, ShieldCheck, Truck } from 'lucide-react';
+
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { addToCartAction } from '@/actions/cart';
@@ -13,6 +15,8 @@ import { Price, PriceRange } from './price';
 import { ProductGallery } from './product-gallery';
 import { VariantSelector } from './variant-selector';
 import { WishlistButton } from './wishlist-button';
+import { StarRating } from './star-rating';
+import { DeliveryEstimate } from './delivery-estimate';
 
 const LOW_STOCK_AT = 5;
 
@@ -129,6 +133,18 @@ export function ProductViewer({
 
         <h1 className="mt-1 text-3xl md:text-4xl">{product.title}</h1>
 
+        {product.rating ? (
+          <a
+            href="#reviews"
+            className="mt-2.5 inline-flex items-center gap-2 text-sm transition-colors hover:text-accent"
+          >
+            <StarRating value={product.rating.average} size="md" showValue />
+            <span className="text-muted-foreground underline underline-offset-4">
+              {product.rating.count} review{product.rating.count === 1 ? '' : 's'}
+            </span>
+          </a>
+        ) : null}
+
         <div className="mt-3 text-lg">
           {matchedVariant ? (
             <Price
@@ -172,6 +188,17 @@ export function ProductViewer({
               unavailableValueIds={unavailableValueIds}
               onSelect={(valueId) =>
                 setSelection((current) => ({ ...current, [option.id]: valueId }))
+              }
+              headerAction={
+                option.name.toLowerCase() === 'size' ? (
+                  <Link
+                    href="/legal/size-guide"
+                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-accent"
+                  >
+                    <Ruler className="size-3.5" strokeWidth={1.6} aria-hidden />
+                    Size guide
+                  </Link>
+                ) : null
               }
             />
           ))}
@@ -220,10 +247,58 @@ export function ProductViewer({
           </li>
         </ul>
 
+        <DeliveryEstimate />
+
         {matchedVariant ? (
           <p className="mt-6 text-xs text-subtle-foreground">SKU {matchedVariant.sku}</p>
         ) : null}
       </div>
+
+      {/* Mobile buy bar. The desktop column is sticky, but on a phone the real
+          Add to bag scrolls away well before the shopper has finished reading,
+          so it is mirrored here. Hidden from assistive tech to avoid announcing
+          a second copy of the same control. */}
+      <div
+        aria-hidden
+        className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-md lg:hidden"
+      >
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs text-muted-foreground">{product.title}</p>
+          <div className="text-sm">
+            {matchedVariant ? (
+              <Price
+                amount={matchedVariant.price}
+                compareAt={matchedVariant.compareAtPrice}
+                currency={product.currency}
+              />
+            ) : (
+              <PriceRange
+                min={product.priceRange.min}
+                max={product.priceRange.max}
+                currency={product.currency}
+              />
+            )}
+          </div>
+        </div>
+
+        <Button
+          size="lg"
+          tabIndex={-1}
+          loading={isPending}
+          disabled={!matchedVariant || soldOut}
+          onClick={onAddToCart}
+          className="shrink-0"
+        >
+          {product.isSoldOut || soldOut
+            ? 'Sold out'
+            : missingOption
+              ? `Select ${missingOption.name.toLowerCase()}`
+              : 'Add to bag'}
+        </Button>
+      </div>
+
+      {/* Runway so the fixed bar never covers the last of the page. */}
+      <div aria-hidden className="h-20 lg:hidden" />
     </div>
   );
 }

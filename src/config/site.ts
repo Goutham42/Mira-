@@ -8,9 +8,18 @@ export const siteConfig = {
   url: clientEnv.NEXT_PUBLIC_APP_URL,
   currency: clientEnv.NEXT_PUBLIC_DEFAULT_CURRENCY,
   locale: 'en-IN',
+  /**
+   * PLACEHOLDER CONTACT DETAILS — replace before launch.
+   *
+   * These render on the contact page, in the footer and behind the WhatsApp
+   * button, so shipping them as-is means customers cannot reach the shop.
+   * `whatsapp` is digits only with the country code, as wa.me requires.
+   */
   support: {
     email: 'support@mira.example',
     phone: '+91 80000 00000',
+    whatsapp: '918000000000',
+    hours: 'Mon – Sat, 10am – 7pm',
   },
   store: {
     label: 'Visit Our Store',

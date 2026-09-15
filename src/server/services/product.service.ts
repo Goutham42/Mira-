@@ -16,6 +16,7 @@ import type {
 import { CATEGORY_TAG, getBreadcrumbsForPath } from './category.service';
 import { recordAudit } from './audit.service';
 import { availableUnits } from './inventory.service';
+import { getRatingsFor, REVIEW_TAG } from './review.service';
 
 export const PRODUCT_TAG = 'products';
 export const productTag = (slug: string) => `product:${slug}`;
@@ -104,7 +105,22 @@ function toProductCard(row: CardRow): ProductCardData {
     isNew:
       publishedAt !== null &&
       Date.now() - publishedAt.getTime() < NEW_ARRIVAL_DAYS * 24 * 60 * 60 * 1000,
+    // Filled in by `withRatings`; one grouped query per grid rather than per card.
+    rating: null,
   };
+}
+
+/**
+ * Attach review averages to a page of cards.
+ *
+ * Kept separate from `toProductCard` so the rating costs exactly one extra
+ * query per grid, no matter how many cards are on it.
+ */
+async function withRatings(cards: ProductCardData[]): Promise<ProductCardData[]> {
+  if (cards.length === 0) return cards;
+  const ratings = await getRatingsFor(cards.map((card) => card.id));
+  if (ratings.size === 0) return cards;
+  return cards.map((card) => ({ ...card, rating: ratings.get(card.id) ?? null }));
 }
 
 export type ListProductsParams = {
@@ -226,7 +242,7 @@ export async function listProducts(
     db.product.count({ where }),
   ]);
 
-  return paginate(rows.map(toProductCard), total, page);
+  return paginate(await withRatings(rows.map(toProductCard)), total, page);
 }
 
 /**
@@ -424,10 +440,10 @@ export const getFeaturedProducts = unstable_cache(
       take: limit,
       select: cardSelect,
     });
-    return rows.map(toProductCard);
+    return withRatings(rows.map(toProductCard));
   },
   ['featured-products'],
-  { tags: [PRODUCT_TAG], revalidate: 600 },
+  { tags: [PRODUCT_TAG, REVIEW_TAG], revalidate: 600 },
 );
 
 export const getNewArrivals = unstable_cache(
@@ -438,10 +454,10 @@ export const getNewArrivals = unstable_cache(
       take: limit,
       select: cardSelect,
     });
-    return rows.map(toProductCard);
+    return withRatings(rows.map(toProductCard));
   },
   ['new-arrivals'],
-  { tags: [PRODUCT_TAG], revalidate: 600 },
+  { tags: [PRODUCT_TAG, REVIEW_TAG], revalidate: 600 },
 );
 
 export async function getRelatedProducts(
@@ -456,7 +472,7 @@ export async function getRelatedProducts(
     take: limit,
     select: cardSelect,
   });
-  return rows.map(toProductCard);
+  return withRatings(rows.map(toProductCard));
 }
 
 /** Slugs for the sitemap. */

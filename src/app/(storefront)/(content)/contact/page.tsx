@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Mail, Package, Phone, Ruler } from 'lucide-react';
 
+import { WhatsAppLink } from '@/components/marketing/whatsapp-link';
+
 import { siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
@@ -28,6 +30,8 @@ export default function ContactPage() {
       </p>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
+        <WhatsAppLink />
+
         <a
           href={`mailto:${siteConfig.support.email}`}
           className="rounded-lg border bg-surface p-5 transition-colors hover:border-border-strong"
@@ -44,7 +48,7 @@ export default function ContactPage() {
           <Phone className="size-5 text-muted-foreground" aria-hidden />
           <p className="mt-3 font-display text-lg">Call us</p>
           <p className="mt-0.5 text-sm text-muted-foreground">{siteConfig.support.phone}</p>
-          <p className="mt-1 text-xs text-subtle-foreground">Mon–Fri, 10am–6pm IST</p>
+          <p className="mt-1 text-xs text-subtle-foreground">{siteConfig.support.hours}</p>
         </a>
       </div>
 

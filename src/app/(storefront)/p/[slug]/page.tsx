@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 import { ProductViewer } from '@/components/commerce/product-viewer';
 import { ProductGrid } from '@/components/commerce/product-grid';
+import { ReviewSection } from '@/components/commerce/review-section';
 import { getProductBySlug, getRelatedProducts } from '@/server/services/product.service';
 import { getWishlistProductIds } from '@/server/services/wishlist.service';
 import { siteConfig } from '@/config/site';
@@ -147,6 +149,12 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             </dl>
           </section>
         ) : null}
+
+        {/* Reviews stream in separately: the summary, list and eligibility check
+            are three queries the buying surface above should not wait on. */}
+        <Suspense fallback={null}>
+          <ReviewSection productId={product.id} productSlug={product.slug} />
+        </Suspense>
 
         {related.length > 0 ? (
           <section className="mt-20 border-t pt-12">

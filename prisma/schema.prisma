@@ -462,6 +462,21 @@ model ProductReview {
   @@index([productId, status])
 }
 
+model NewsletterSubscriber {
+  id    String @id @default(cuid())
+  email String @unique
+
+  /// Where the address was captured, e.g. "footer" — useful when more than one
+  /// form exists and you need to know which one actually works.
+  source String?
+
+  unsubscribedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([createdAt])
+}
+
 // ---------------------------------------------------------------------------
 // Inventory
 // ---------------------------------------------------------------------------

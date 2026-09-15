@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { ProductCardData } from '@/types/catalog';
 import { Price } from './price';
+import { StarRating } from './star-rating';
 import { WishlistButton } from './wishlist-button';
 
 /**
@@ -89,6 +90,10 @@ export function ProductCard({
         </h3>
 
         <Price amount={product.price} compareAt={product.compareAtPrice} size="sm" />
+
+        {product.rating ? (
+          <StarRating value={product.rating.average} count={product.rating.count} />
+        ) : null}
 
         {product.colors.length > 1 ? (
           <p className="text-xs text-muted-foreground">

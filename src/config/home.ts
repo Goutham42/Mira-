@@ -62,43 +62,38 @@ export const heroScript = 'Style Your Story';
 export type CategoryTile = {
   key: GarmentIconKey;
   name: string;
-  href: string;
 };
 
 export const categoryRail: CategoryTile[] = [
-  { key: 'kurtis', name: 'Kurtis', href: '/c/kurtis' },
-  { key: 'salwar-sets', name: 'Salwar Sets', href: '/c/salwar-sets' },
-  { key: 'leggings', name: 'Leggings', href: '/c/leggings' },
-  { key: 'inners', name: 'Inners', href: '/c/inners' },
-  { key: 'nighties', name: 'Nighties', href: '/c/nighties' },
-  { key: 'inskirt', name: 'Inskirt', href: '/c/inskirt' },
+  { key: 'kurtis', name: 'Kurtis' },
+  { key: 'salwar-sets', name: 'Salwar Sets' },
+  { key: 'leggings', name: 'Leggings' },
+  { key: 'inners', name: 'Inners' },
+  { key: 'nighties', name: 'Nighties' },
+  { key: 'inskirt', name: 'Inskirt' },
 ];
 
 export type FeaturedCollection = {
   name: string;
   caption: string;
-  href: string;
 } & Slot;
 
 export const featuredCollections: FeaturedCollection[] = [
   {
     name: 'Kurtis',
     caption: 'Everyday Chic',
-    href: '/c/kurtis',
     image: null,
     alt: 'Model in a pink embroidered kurti',
   },
   {
     name: 'Salwar Sets',
     caption: 'Grace in Every Step',
-    href: '/c/salwar-sets',
     image: null,
     alt: 'Model in a teal salwar set',
   },
   {
     name: 'Nighties',
     caption: 'Comfort All Day',
-    href: '/c/nighties',
     image: null,
     alt: 'Model in a maroon printed nightie',
   },

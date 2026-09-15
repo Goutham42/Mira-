@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { Search } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 export function SearchInput({ initialQuery }: { initialQuery: string }) {
   const router = useRouter();
   const [value, setValue] = useState(initialQuery);
+  const [isPending, startTransition] = useTransition();
 
   return (
     <form
@@ -24,7 +25,9 @@ export function SearchInput({ initialQuery }: { initialQuery: string }) {
       onSubmit={(event) => {
         event.preventDefault();
         const trimmed = value.trim();
-        router.push(trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : '/search');
+        startTransition(() => {
+          router.push(trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : '/search');
+        });
       }}
       className="flex max-w-xl gap-2"
     >
@@ -45,7 +48,9 @@ export function SearchInput({ initialQuery }: { initialQuery: string }) {
           autoComplete="off"
         />
       </div>
-      <Button type="submit">Search</Button>
+      <Button type="submit" loading={isPending}>
+        Search
+      </Button>
     </form>
   );
 }

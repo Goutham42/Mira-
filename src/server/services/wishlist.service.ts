@@ -71,6 +71,8 @@ export async function getWishlist(): Promise<ProductCardData[]> {
         (variant) => !variant.inventoryItem || availableUnits(variant.inventoryItem) <= 0,
       ),
       isNew: false,
+      // The wishlist is a saved-items list, not a merchandising surface.
+      rating: null,
     }));
 }
 

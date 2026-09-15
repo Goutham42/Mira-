@@ -15,11 +15,14 @@ export function VariantSelector({
   selectedValueId,
   unavailableValueIds,
   onSelect,
+  headerAction,
 }: {
   option: ProductOptionData;
   selectedValueId: string | null;
   unavailableValueIds: Set<string>;
   onSelect: (valueId: string) => void;
+  /** Rendered at the end of the legend — the size guide link lives here. */
+  headerAction?: React.ReactNode;
 }) {
   const isColor = option.name.toLowerCase() === 'color';
   const selectedValue = option.values.find((value) => value.id === selectedValueId);
@@ -28,9 +31,12 @@ export function VariantSelector({
     <fieldset className="space-y-2.5">
       <legend className="flex w-full items-baseline justify-between gap-4">
         <span className="label-caps">{option.name}</span>
-        {selectedValue ? (
-          <span className="text-sm text-muted-foreground">{selectedValue.value}</span>
-        ) : null}
+        <span className="flex items-baseline gap-4">
+          {selectedValue ? (
+            <span className="text-sm text-muted-foreground">{selectedValue.value}</span>
+          ) : null}
+          {headerAction}
+        </span>
       </legend>
 
       <div className="flex flex-wrap gap-2">

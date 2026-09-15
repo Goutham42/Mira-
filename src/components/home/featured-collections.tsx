@@ -3,8 +3,12 @@ import { ArrowRight } from 'lucide-react';
 
 import { ImageSlot } from '@/components/ui/image-slot';
 import { collectionPromo, featuredCollections } from '@/config/home';
+import { resolveCategoryHref } from '@/lib/category-href';
+import { getCategoryTree } from '@/server/services/category.service';
 
-export function FeaturedCollections() {
+export async function FeaturedCollections() {
+  const categories = await getCategoryTree();
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="flex items-end justify-between gap-4">
@@ -26,7 +30,7 @@ export function FeaturedCollections() {
         {featuredCollections.map((collection) => (
           <Link
             key={collection.name}
-            href={collection.href}
+            href={resolveCategoryHref(categories, collection.name)}
             className="group flex flex-col overflow-hidden rounded-sm border border-border/70 bg-surface"
           >
             <ImageSlot
