@@ -22,7 +22,10 @@ function authorized(request: NextRequest): boolean {
  *
  * Without this, an abandoned checkout would keep its items locked forever and
  * the shop would show sold out while holding stock nobody is buying.
- * Schedule every few minutes.
+ *
+ * Driven every 5 minutes by .github/workflows/release-reservations.yml, not by
+ * the Vercel cron: Hobby accounts reject any schedule that runs more than once
+ * a day. The daily entry in vercel.json remains as a backstop.
  */
 async function handle(request: NextRequest) {
   if (!authorized(request)) {

@@ -37,11 +37,12 @@ const nextConfig: NextConfig = {
   /**
    * Packages Next must not bundle into the server build.
    *
-   * pino spawns its pretty-printing transport in a worker thread and Prisma and
-   * argon2 load native binaries — bundling any of them breaks module resolution
-   * at runtime.
+   * pino spawns its pretty-printing transport in a worker thread and Prisma
+   * loads a native binary — bundling either breaks module resolution at
+   * runtime. Password hashing is WASM (hash-wasm) with the module inlined, so
+   * it bundles normally and is deliberately not listed here.
    */
-  serverExternalPackages: ['pino', 'pino-pretty', '@prisma/client', '@node-rs/argon2'],
+  serverExternalPackages: ['pino', 'pino-pretty', '@prisma/client'],
 
   experimental: {
     // Server Actions are the mutation path for our own UI; lock the body size

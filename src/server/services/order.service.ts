@@ -16,6 +16,8 @@ import type {
   OrderSummaryView,
 } from '@/types/order';
 import { getPaymentProvider } from '@/server/payments';
+import { sendEmail } from '@/server/email/client';
+import { orderConfirmationTemplate } from '@/server/email/templates';
 import { clearCart, getCartView } from './cart.service';
 import { computeTotals, validateDiscountCode } from './pricing.service';
 import { commitReservations, releaseReservations, reserveStock, restoreCommittedStock } from './inventory.service';
@@ -260,6 +262,26 @@ export async function placeOrder(input: CheckoutInput): Promise<PlaceOrderResult
   });
 
   await clearCart(cartId);
+
+  // Deliberately not awaited into the failure path: the order is placed and
+  // the stock is held, so a mail outage must not surface as a checkout error.
+  const confirmation = orderConfirmationTemplate({
+    orderNumber: order.orderNumber,
+    currency: totals.currency,
+    grandTotal: totals.grandTotal,
+    settlesOffline: provider.settlesOffline,
+    lines: cart.lines.map((line) => ({
+      title: [line.productTitle, line.variantTitle].filter(Boolean).join(' — '),
+      quantity: line.quantity,
+      lineTotal: line.lineTotal,
+    })),
+  });
+  await sendEmail({
+    to: input.email,
+    subject: confirmation.subject,
+    html: confirmation.html,
+    text: confirmation.text,
+  });
 
   return {
     orderNumber: order.orderNumber,

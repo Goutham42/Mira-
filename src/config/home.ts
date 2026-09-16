@@ -13,9 +13,13 @@ import { siteConfig } from '@/config/site';
  */
 
 type Slot = {
-  /** Photography URL. Leave `null` to render a labelled empty slot. */
+  /**
+   * Photography. A path under `public/` (e.g. `/images/boutique-rail.jpg`) or
+   * a remote URL whose host is allowed in next.config.ts. `null` renders a
+   * labelled empty slot instead.
+   */
   image: string | null;
-  /** Alt text to use once a real image is in place. */
+  /** Describes the photograph actually in the slot, for screen readers. */
   alt: string;
 };
 
@@ -33,24 +37,24 @@ export const heroSlides: HeroSlide[] = [
     title: ['Everyday', 'Elegance'],
     subtitle: 'Kurtis and salwar sets you can live in, all day',
     cta: { label: 'Shop New Arrivals', href: '/shop?sort=newest' },
-    image: null,
-    alt: 'Model wearing a printed kurti with a teal dupatta',
+    image: '/images/boutique-rail.jpg',
+    alt: 'Shopper browsing a rail of clothes in a boutique',
   },
   {
     eyebrow: 'Made for',
     title: ['Effortless', 'Comfort'],
     subtitle: 'Breathable cotton that softens with every wash',
     cta: { label: 'Shop Kurtis', href: '/shop' },
-    image: null,
-    alt: 'Model in a pastel salwar set',
+    image: '/images/floral-rail.jpg',
+    alt: 'Rail of floral print dresses',
   },
   {
     eyebrow: 'Dressed for',
     title: ['Every', 'Occasion'],
     subtitle: 'From the school run to the family function',
     cta: { label: 'Explore Collections', href: '/shop' },
-    image: null,
-    alt: 'Model in a festive embroidered kurta set',
+    image: '/images/evening-rail.jpg',
+    alt: 'Occasion wear on a rail under warm lights',
   },
 ];
 
@@ -82,28 +86,28 @@ export const featuredCollections: FeaturedCollection[] = [
   {
     name: 'Kurtis',
     caption: 'Work, weekend, everything between',
-    image: null,
-    alt: 'Model in a pink embroidered kurti',
+    image: '/images/shopper-bags.jpg',
+    alt: 'Shopper carrying bags beside a clothing rail',
   },
   {
     name: 'Salwar Sets',
     caption: 'Set and ready, no thinking required',
-    image: null,
-    alt: 'Model in a teal salwar set',
+    image: '/images/evening-rail.jpg',
+    alt: 'Occasion wear on a rail under warm lights',
   },
   {
     name: 'Nighties',
     caption: 'The softest thing you own',
-    image: null,
-    alt: 'Model in a maroon printed nightie',
+    image: '/images/floral-rail.jpg',
+    alt: 'Rail of floral print dresses',
   },
 ];
 
 export const collectionPromo = {
   headline: ['Chosen for how', 'they feel on', 'the fiftieth wear'],
   cta: { label: 'Explore Now', href: '/shop' },
-  image: null as string | null,
-  alt: 'Stack of folded printed fabrics',
+  image: '/images/boutique-rail.jpg' as string | null,
+  alt: 'Shopper browsing a rail of clothes in a boutique',
 };
 
 export type Reason = {
@@ -135,8 +139,8 @@ export const aboutSection = {
   body:
     'we make ethnic wear for the days you actually have — not the two a year that need an occasion. Kurtis, salwar sets and the essentials underneath, chosen for how they behave after a month of wearing, and priced so buying another is never a decision.',
   cta: { label: 'Our Story', href: '/about' },
-  image: null as string | null,
-  alt: 'Woman in an ethnic set holding a bunch of flowers',
+  image: '/images/shopper-bags.jpg' as string | null,
+  alt: 'Shopper carrying bags beside a clothing rail',
 };
 
 export type Assurance = {
@@ -161,13 +165,15 @@ export const instagramSection = {
   /** The teal card sits in place of a photo at this index. */
   cardIndex: 6,
   cardLines: ['Good', 'Outfits', 'Brighter', 'Days'],
+  // Index 6 is covered by the teal card (see `cardIndex`), so its image never
+  // renders; it is filled anyway so reordering the tiles cannot leave a hole.
   tiles: [
-    { image: null, alt: 'Folded stack of printed fabrics' },
-    { image: null, alt: 'Customer in a green kurta set' },
-    { image: null, alt: 'Plant beside a fabric roll' },
-    { image: null, alt: 'Customer in a pink kurti' },
-    { image: null, alt: 'Close-up of a floral print' },
-    { image: null, alt: 'Customer in a cream kurta' },
-    { image: null, alt: 'Customer in a maroon kurti' },
+    { image: '/images/floral-rail.jpg', alt: 'Rail of floral print dresses' },
+    { image: '/images/shopper-bags.jpg', alt: 'Shopper carrying bags beside a clothing rail' },
+    { image: '/images/boutique-interior.jpg', alt: 'Inside a boutique, clothes on rails' },
+    { image: '/images/boutique-rail.jpg', alt: 'Shopper browsing a rail of clothes in a boutique' },
+    { image: '/images/evening-rail.jpg', alt: 'Occasion wear on a rail under warm lights' },
+    { image: '/images/floral-rail.jpg', alt: 'Rail of floral print dresses' },
+    { image: '/images/boutique-rail.jpg', alt: 'Shopper browsing a rail of clothes in a boutique' },
   ] as Slot[],
 };

@@ -8,6 +8,8 @@ import { hashPassword, verifyPassword } from '@/server/auth/password';
 import { enforceRateLimit, rateLimits } from '@/lib/rate-limit';
 import { paginate, parsePageParams } from '@/lib/pagination';
 import { logger } from '@/lib/logger';
+import { sendEmail } from '@/server/email/client';
+import { passwordResetTemplate, verifyEmailTemplate } from '@/server/email/templates';
 import type { RegisterInput } from '@/lib/validation/auth';
 import type { SaveAddressInput } from '@/lib/validation/address';
 
@@ -71,10 +73,12 @@ export async function registerUser(input: RegisterInput) {
     data: { userId: user.id, tokenHash, expiresAt },
   });
 
-  // Email delivery is not wired up yet; the link is logged so the flow is
-  // testable end to end in development.
+  // Delivery failure must not undo a successful registration — the shopper can
+  // request a fresh verification link later.
+  const { subject, html, text } = verifyEmailTemplate(token);
+  const result = await sendEmail({ to: user.email, subject, html, text });
   logger.info(
-    { userId: user.id, verifyPath: `/verify-email?token=${token}` },
+    { userId: user.id, delivered: result.delivered },
     'Email verification token issued',
   );
 
@@ -100,10 +104,9 @@ export async function requestPasswordReset(email: string): Promise<void> {
   const { token, tokenHash, expiresAt } = generateToken();
   await db.passwordResetToken.create({ data: { userId: user.id, tokenHash, expiresAt } });
 
-  logger.info(
-    { userId: user.id, resetPath: `/reset-password?token=${token}` },
-    'Password reset token issued',
-  );
+  const { subject, html, text } = passwordResetTemplate(token);
+  const result = await sendEmail({ to: email, subject, html, text });
+  logger.info({ userId: user.id, delivered: result.delivered }, 'Password reset token issued');
 }
 
 export async function resetPassword(rawToken: string, newPassword: string): Promise<void> {

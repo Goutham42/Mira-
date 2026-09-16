@@ -8,11 +8,26 @@
  * Idempotent — safe to re-run. Never run against production.
  */
 import { PrismaClient, type Prisma } from '@prisma/client';
-import { hash } from '@node-rs/argon2';
+import { randomBytes } from 'node:crypto';
+import { argon2id } from 'hash-wasm';
 
 const db = new PrismaClient();
 
-const ARGON2 = { memoryCost: 19_456, timeCost: 2, parallelism: 1 } as const;
+/**
+ * Must stay in step with src/server/auth/password.ts. Kept local rather than
+ * imported because that module is marked `server-only`, which this script is
+ * not — the parameters are encoded into the hash, so a drift would surface as
+ * a failed login rather than silently.
+ */
+const ARGON2 = {
+  memorySize: 19_456,
+  iterations: 2,
+  parallelism: 1,
+  hashLength: 32,
+} as const;
+
+const hash = (password: string) =>
+  argon2id({ password, salt: randomBytes(16), outputType: 'encoded', ...ARGON2 });
 
 const CURRENCY = 'INR';
 /** Rupees to paise. */
@@ -177,7 +192,7 @@ async function seedUsers() {
     where: { email: adminEmail },
     create: {
       email: adminEmail,
-      passwordHash: await hash(adminPassword, ARGON2),
+      passwordHash: await hash(adminPassword),
       firstName: 'Mira',
       lastName: 'Admin',
       name: 'Mira Admin',
@@ -194,7 +209,7 @@ async function seedUsers() {
     where: { email: customerEmail },
     create: {
       email: customerEmail,
-      passwordHash: await hash(adminPassword || 'ChangeMe123!', ARGON2),
+      passwordHash: await hash(adminPassword || 'ChangeMe123!'),
       firstName: 'Sample',
       lastName: 'Customer',
       name: 'Sample Customer',
