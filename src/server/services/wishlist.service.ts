@@ -67,6 +67,8 @@ export async function getWishlist(): Promise<ProductCardData[]> {
       compareAtPrice: product.compareAtPrice,
       currency: product.currency,
       colors: [],
+      // The wishlist shows saved items, not a colour picker.
+      colorImages: {},
       isSoldOut: product.variants.every(
         (variant) => !variant.inventoryItem || availableUnits(variant.inventoryItem) <= 0,
       ),

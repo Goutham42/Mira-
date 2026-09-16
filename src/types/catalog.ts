@@ -17,6 +17,14 @@ export type ProductCardData = {
   compareAtPrice: number | null;
   currency: string;
   colors: { value: string; hexColor: string | null }[];
+  /**
+   * Colour value -> image URL, for swatch previews on the card.
+   *
+   * Only contains entries for colours that actually have a tagged image
+   * (`ProductImage.colorValue`); a colour missing here keeps the default
+   * image, so the swatch still selects but the picture does not change.
+   */
+  colorImages: Record<string, string>;
   isSoldOut: boolean;
   isNew: boolean;
   /** Null when the product has no approved reviews yet. */
@@ -114,6 +122,28 @@ export type CategoryNode = {
   productCount: number;
   children: CategoryNode[];
 };
+
+/**
+ * The subset of a product the quick-view modal needs.
+ *
+ * Derived from `ProductDetailData` rather than declared separately so a field
+ * renamed on the detail page cannot silently drift out of the modal.
+ */
+export type QuickViewData = Pick<
+  ProductDetailData,
+  | 'id'
+  | 'slug'
+  | 'title'
+  | 'shortDescription'
+  | 'currency'
+  | 'priceRange'
+  | 'compareAtPrice'
+  | 'images'
+  | 'options'
+  | 'variants'
+  | 'isSoldOut'
+  | 'rating'
+>;
 
 export type CatalogFacets = {
   sizes: { value: string; count: number }[];

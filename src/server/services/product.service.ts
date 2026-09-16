@@ -44,8 +44,11 @@ const cardSelect = {
   publishedAt: true,
   images: {
     orderBy: { position: 'asc' },
-    take: 2,
-    select: { url: true, alt: true },
+    // Two for the default and hover pair, the rest to back the colour
+    // swatches. Capped rather than unbounded: a card only ever shows one
+    // image at a time, so fetching a full gallery per tile would be waste.
+    take: 12,
+    select: { url: true, alt: true, colorValue: true },
   },
   variants: {
     where: { isActive: true },
@@ -88,6 +91,15 @@ function toProductCard(row: CardRow): ProductCardData {
     }
   }
 
+  // First tagged image wins per colour; untagged images stay as the default
+  // and hover pair below.
+  const colorImages: Record<string, string> = {};
+  for (const image of row.images) {
+    if (image.colorValue && !(image.colorValue in colorImages)) {
+      colorImages[image.colorValue] = image.url;
+    }
+  }
+
   const [primaryImage, hoverImage] = row.images;
   const publishedAt = row.publishedAt;
 
@@ -102,6 +114,7 @@ function toProductCard(row: CardRow): ProductCardData {
     compareAtPrice: row.compareAtPrice,
     currency: row.currency,
     colors: [...colors].map(([value, hexColor]) => ({ value, hexColor })),
+    colorImages,
     isSoldOut,
     isNew:
       publishedAt !== null &&
