@@ -173,7 +173,7 @@ const PRODUCTS: SeedProduct[] = [
 const WEAK_DEFAULTS = new Set(['ChangeMe123!', 'password', 'admin', '']);
 
 async function seedUsers() {
-  const adminEmail = (process.env.SEED_ADMIN_EMAIL ?? 'gouthamhavoc@gmail.com').toLowerCase();
+  const adminEmail = (process.env.SEED_ADMIN_EMAIL ?? 'admin@mira.example').toLowerCase();
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? '';
 
   // Anywhere reachable by other people, a known seed password is a back door
