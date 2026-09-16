@@ -44,3 +44,6 @@ Thumbs.db
 
 .vercel
 .env*
+
+# VS Code Local History extension — editor snapshots, not source
+.history/
