@@ -5,11 +5,20 @@ import {
   type StorefrontSearchParams,
 } from '@/components/commerce/product-listing';
 import { headlines } from '@/config/site';
+import { listingMetadata } from '@/lib/listing-metadata';
 
-export const metadata: Metadata = {
-  title: headlines.shop.title,
-  description: headlines.shop.description,
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<StorefrontSearchParams>;
+}): Promise<Metadata> {
+  return listingMetadata({
+    basePath: '/shop',
+    searchParams: await searchParams,
+    title: headlines.shop.title,
+    description: headlines.shop.description,
+  });
+}
 
 export default async function ShopPage({
   searchParams,

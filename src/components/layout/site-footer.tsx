@@ -16,7 +16,7 @@ import {
   YoutubeIcon,
 } from '@/components/brand/social-icons';
 import { NewsletterForm } from '@/components/marketing/newsletter-form';
-import { footerNav, siteConfig } from '@/config/site';
+import { footerNav, legalNav, siteConfig } from '@/config/site';
 
 const assurances = [
   { label: 'Free shipping', detail: 'On prepaid orders above the threshold', Icon: Truck },
@@ -169,6 +169,17 @@ export function SiteFooter() {
           <p>
             © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
           </p>
+          <nav aria-label="Legal" className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            {legalNav.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="transition-colors hover:text-primary-foreground"
+              >
+                {link.title}
+              </Link>
+            ))}
+          </nav>
           <p className="flex items-center gap-1.5">
             Made with
             <svg

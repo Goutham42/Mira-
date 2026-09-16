@@ -132,6 +132,8 @@ export type ListProductsParams = {
   minPrice?: number;
   maxPrice?: number;
   sort?: 'newest' | 'price-asc' | 'price-desc' | 'popular';
+  /** Hide products with nothing sellable left. */
+  inStockOnly?: boolean;
   page?: number;
   pageSize?: number;
 };
@@ -226,6 +228,29 @@ function buildProductWhere(params: ListProductsParams): Prisma.ProductWhereInput
       basePrice: {
         ...(params.minPrice !== undefined ? { gte: params.minPrice } : {}),
         ...(params.maxPrice !== undefined ? { lte: params.maxPrice } : {}),
+      },
+    });
+  }
+
+  if (params.inStockOnly) {
+    /**
+     * Mirrors `availableUnits`: backorderable stock always counts as
+     * available, otherwise a variant needs unreserved units left. Expressed as
+     * a column-to-column comparison so the database does the filtering — doing
+     * it in `toProductCard` would break pagination, because the page would be
+     * sliced before the sold-out rows were removed.
+     */
+    and.push({
+      variants: {
+        some: {
+          isActive: true,
+          inventoryItem: {
+            OR: [
+              { allowBackorder: true },
+              { quantity: { gt: db.inventoryItem.fields.reserved } },
+            ],
+          },
+        },
       },
     });
   }

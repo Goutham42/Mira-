@@ -93,6 +93,20 @@ export const footerNav = [
   },
 ] as const;
 
+/**
+ * Policy links for the footer's bottom bar.
+ *
+ * Kept out of `footerNav` so the Customer Care column stays the four links the
+ * layout was designed around. These must remain reachable from every page:
+ * payment providers check for them during onboarding, and the grievance
+ * officer named in the privacy policy has to be findable.
+ */
+export const legalNav = [
+  { title: 'Privacy', href: '/legal/privacy' },
+  { title: 'Terms', href: '/legal/terms' },
+  { title: 'Shipping & Returns', href: '/legal/shipping-returns' },
+] as const;
+
 export const adminNav = [
   { title: 'Dashboard', href: '/admin', icon: 'LayoutDashboard' },
   { title: 'Orders', href: '/admin/orders', icon: 'ShoppingBag' },

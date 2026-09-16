@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { revalidateTag, unstable_cache } from 'next/cache';
 import type { Prisma } from '@prisma/client';
 
@@ -96,7 +97,14 @@ export const getCategoryTree = unstable_cache(
   { tags: [CATEGORY_TAG], revalidate: 3600 },
 );
 
-export async function getCategoryByPath(path: string) {
+/**
+ * Request-deduped: the category page resolves the same path twice, once in
+ * `generateMetadata` and once in the page body, and without this that is two
+ * identical round trips on every category view. React's `cache` is the right
+ * tool rather than `unstable_cache` — the result is per-request, so an admin
+ * edit is visible on the next request with no tag to invalidate.
+ */
+export const getCategoryByPath = cache(async (path: string) => {
   return db.category.findFirst({
     where: { path, deletedAt: null, isActive: true },
     select: {
@@ -110,6 +118,30 @@ export async function getCategoryByPath(path: string) {
       seoDescription: true,
     },
   });
+});
+
+/**
+ * The immediate children of a category, with product counts.
+ *
+ * Read from the cached tree rather than queried: the tree is already loaded
+ * for the header on every page, so a drill-down row costs nothing extra.
+ * Returns an empty array for a leaf, which is the caller's signal to render
+ * nothing.
+ */
+export async function getChildCategories(path: string): Promise<CategoryNode[]> {
+  const findByPath = (nodes: CategoryNode[]): CategoryNode | undefined => {
+    for (const node of nodes) {
+      if (node.path === path) return node;
+      // Only descend where the path could actually live.
+      if (path.startsWith(`${node.path}/`)) {
+        const found = findByPath(node.children);
+        if (found) return found;
+      }
+    }
+    return undefined;
+  };
+
+  return findByPath(await getCategoryTree())?.children ?? [];
 }
 
 /** Breadcrumb trail derived from the materialised path — no recursive query. */

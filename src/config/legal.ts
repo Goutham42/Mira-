@@ -34,7 +34,7 @@ export const LEGAL_PAGES: LegalPage[] = [
         heading: 'Dispatch',
         body: [
           'Orders placed before 2pm on a working day are dispatched the same day. Anything after that goes out the next working day.',
-          'You will get an email with tracking as soon as the parcel leaves us.',
+          'You will get an email confirming your order as soon as it is placed. Once your parcel is handed to the courier we will contact you with the tracking details.',
         ],
       },
       {
@@ -43,6 +43,23 @@ export const LEGAL_PAGES: LegalPage[] = [
           'Standard delivery is 3–6 working days across India.',
           'Shipping is free on orders over ₹2,000. Below that, a flat ₹99 applies.',
           'We do not currently ship outside India.',
+        ],
+      },
+      {
+        heading: 'How you pay',
+        body: [
+          'Orders are settled offline: cash on delivery, or bank transfer before dispatch. We will confirm the method with you after you place the order.',
+          'Your order is held — with the stock reserved for you — until payment is arranged. We do not take card payments online at present.',
+        ],
+      },
+      {
+        heading: 'Cancelling an order',
+        body: [
+          'You can cancel any order at no cost before it is dispatched. Email ' +
+            siteConfig.support.email +
+            ' with your order number, or call us, and we will confirm the cancellation.',
+          'Once an order has been dispatched it can no longer be cancelled, but you can return it under the policy below.',
+          'If we cancel an order — because an item is out of stock, or a price was wrong — we will tell you why and refund anything already paid in full.',
         ],
       },
       {
@@ -95,9 +112,9 @@ export const LEGAL_PAGES: LegalPage[] = [
       {
         heading: 'Fit notes',
         body: [
-          'Our dresses are cut with room through the body. If you are between sizes, take the smaller one unless you want a looser line.',
-          'Linen relaxes with wear and softens after the first wash. It does not stretch — size for how it fits on day one.',
-          'Bias-cut silk skims rather than clings. Take your usual size.',
+          'Our kurtis are cut with room through the body and are meant to skim rather than fit close. If you are between sizes, take the smaller one unless you want a looser line.',
+          'Salwar sets are sized on the kurta. The bottoms come with a drawstring or elasticated waist, so a small difference at the waist is easily adjusted.',
+          'Cotton softens with washing and may relax very slightly through the body. Size for how it fits on day one.',
         ],
       },
     ],
@@ -119,7 +136,7 @@ export const LEGAL_PAGES: LegalPage[] = [
       {
         heading: 'What we do not collect',
         body: [
-          'We never see or store your card number. Card details are handled entirely by our payment provider and never reach our servers.',
+          'We never see or store card numbers. Orders are currently settled offline — cash on delivery, or bank transfer — so no card details are collected at any point. If we add a card payment gateway, those details will be handled entirely by that provider and will still never reach our servers.',
           'We do not sell your data, and we do not share it with advertisers.',
         ],
       },
@@ -144,10 +161,25 @@ export const LEGAL_PAGES: LegalPage[] = [
         ],
       },
       {
+        heading: 'Grievance officer',
+        body: [
+          'Under the Consumer Protection (E-Commerce) Rules, 2020 we name an officer responsible for complaints about this site and anything bought through it.',
+          '[BEFORE LAUNCH: add the grievance officer’s name and designation here.]',
+          'Contact: ' +
+            siteConfig.support.email +
+            ', or ' +
+            siteConfig.support.phone +
+            ', ' +
+            siteConfig.support.hours +
+            '.',
+          'We acknowledge every complaint within 48 hours and aim to resolve it within one month of receiving it.',
+        ],
+      },
+      {
         heading: 'Who to contact',
         body: [
           'Questions about this policy: ' + siteConfig.support.email + '.',
-          '[Add your registered business name, address and any data-protection registration number here before launch.]',
+          '[BEFORE LAUNCH: add your registered business name, full postal address, and GSTIN if registered.]',
         ],
       },
     ],
@@ -168,8 +200,8 @@ export const LEGAL_PAGES: LegalPage[] = [
       {
         heading: 'Pricing',
         body: [
-          'Prices include applicable taxes and are shown in Indian rupees.',
-          'Prices can change, but never after you have placed an order. The amount shown at checkout is the amount you pay.',
+          'Prices are shown in Indian rupees. Applicable tax and any delivery charge are added at checkout and itemised there before you confirm.',
+          'Prices can change, but never after you have placed an order. The total shown on the checkout page is the amount you pay.',
         ],
       },
       {
@@ -186,9 +218,23 @@ export const LEGAL_PAGES: LegalPage[] = [
         ],
       },
       {
+        heading: 'Payment',
+        body: [
+          'Orders are settled offline — cash on delivery, or bank transfer before dispatch. We confirm the method with you after the order is placed.',
+          'Stock is reserved for you while payment is arranged. If payment is not arranged within a reasonable period we may release the reservation and cancel the order, and we will tell you before we do.',
+        ],
+      },
+      {
+        heading: 'Complaints',
+        body: [
+          'If something goes wrong, contact our grievance officer — named in our privacy policy — and we will acknowledge your complaint within 48 hours and aim to resolve it within one month.',
+        ],
+      },
+      {
         heading: 'Governing law',
         body: [
-          '[Specify the governing jurisdiction for your registered business before launch.]',
+          'These terms are governed by the laws of India, and the courts at [BEFORE LAUNCH: insert your city, e.g. Coimbatore, Tamil Nadu] have exclusive jurisdiction.',
+          '[BEFORE LAUNCH: confirm this with your lawyer, and insert the registered business name these terms are made with.]',
         ],
       },
     ],

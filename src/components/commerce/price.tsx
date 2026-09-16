@@ -23,6 +23,9 @@ export function Price({
   className?: string;
 }) {
   const discount = calculateDiscountPercent(amount, compareAt ?? null);
+  // Narrowed once so the markup below reads as one condition rather than
+  // repeating the pair, and so `compareAt` is non-null inside the branch.
+  const isDiscounted = discount !== null && compareAt != null;
 
   return (
     <span className={cn('inline-flex flex-wrap items-baseline gap-x-2', className)}>
@@ -34,10 +37,16 @@ export function Price({
           size === 'lg' && 'text-xl',
         )}
       >
+        {/*
+          Strikethrough is a purely visual signal — `line-through` is not
+          announced, so without these labels a screen reader reads two bare
+          amounts and the discount has to be inferred.
+        */}
+        {isDiscounted ? <span className="sr-only">Sale price </span> : null}
         {formatMoney(amount, currency, siteConfig.locale)}
       </span>
 
-      {discount !== null && compareAt ? (
+      {isDiscounted ? (
         <>
           <span
             className={cn(
@@ -45,6 +54,7 @@ export function Price({
               size === 'lg' ? 'text-sm' : 'text-xs',
             )}
           >
+            <span className="sr-only">Regular price </span>
             {formatMoney(compareAt, currency, siteConfig.locale)}
           </span>
           <span className="text-xs font-medium text-accent">{discount}% off</span>

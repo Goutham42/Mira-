@@ -1,4 +1,5 @@
 import { ProductGridSkeleton } from './product-grid';
+import { DEFAULT_PAGE_SIZE } from '@/lib/pagination';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
@@ -35,7 +36,7 @@ export function ListingSkeleton() {
 
         <div className="min-w-0 flex-1">
           <Skeleton className="mb-6 h-4 w-28" />
-          <ProductGridSkeleton count={8} />
+          <ProductGridSkeleton count={DEFAULT_PAGE_SIZE} />
         </div>
       </div>
     </div>

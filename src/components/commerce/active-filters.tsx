@@ -6,10 +6,15 @@ import { useTransition } from 'react';
 
 import { cn } from '@/lib/utils';
 
-import { formatMoney } from '@/lib/money';
+import { formatMoney, toMinorUnits } from '@/lib/money';
 import { siteConfig } from '@/config/site';
 
-const FILTER_KEYS = ['size', 'color', 'minPrice', 'maxPrice'] as const;
+const FILTER_KEYS = ['size', 'color', 'minPrice', 'maxPrice', 'inStock'] as const;
+
+/** Price params are whole currency units in the URL; formatMoney wants minor. */
+function formatMajor(value: string, currency: string): string {
+  return formatMoney(toMinorUnits(Number(value), currency), currency, siteConfig.locale);
+}
 
 /**
  * Removable chips for whatever is currently filtered.
@@ -32,21 +37,17 @@ export function ActiveFilters({ currency = siteConfig.currency }: { currency?: s
     chips.push({ key: 'color', value, label: value });
   }
 
+  if (searchParams.get('inStock') === '1') {
+    chips.push({ key: 'inStock', value: '1', label: 'In stock only' });
+  }
+
   const min = searchParams.get('minPrice');
   const max = searchParams.get('maxPrice');
   if (min) {
-    chips.push({
-      key: 'minPrice',
-      value: min,
-      label: `From ${formatMoney(Number(min), currency, siteConfig.locale)}`,
-    });
+    chips.push({ key: 'minPrice', value: min, label: `From ${formatMajor(min, currency)}` });
   }
   if (max) {
-    chips.push({
-      key: 'maxPrice',
-      value: max,
-      label: `Up to ${formatMoney(Number(max), currency, siteConfig.locale)}`,
-    });
+    chips.push({ key: 'maxPrice', value: max, label: `Up to ${formatMajor(max, currency)}` });
   }
 
   if (chips.length === 0) return null;
@@ -54,7 +55,9 @@ export function ActiveFilters({ currency = siteConfig.currency }: { currency?: s
   function remove(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (key === 'minPrice' || key === 'maxPrice') {
+    // Single-valued keys are dropped outright; the repeatable ones keep their
+    // other values.
+    if (key === 'minPrice' || key === 'maxPrice' || key === 'inStock') {
       params.delete(key);
     } else {
       const remaining = params.getAll(key).filter((entry) => entry !== value);

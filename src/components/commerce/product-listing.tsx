@@ -3,6 +3,9 @@ import { SlidersHorizontal } from 'lucide-react';
 
 import { listProducts, getCatalogFacets } from '@/server/services/product.service';
 import { getWishlistProductIds } from '@/server/services/wishlist.service';
+import { DEFAULT_PAGE_SIZE } from '@/lib/pagination';
+import { toMinorUnits } from '@/lib/money';
+import { siteConfig } from '@/config/site';
 import { ActiveFilters } from './active-filters';
 import { SearchSuggestions } from './search-suggestions';
 import { FilterPanel } from './filter-panel';
@@ -18,6 +21,14 @@ const SORTS = new Set(['newest', 'price-asc', 'price-desc', 'popular']);
 function asArray(value: string | string[] | undefined): string[] {
   if (value === undefined) return [];
   return Array.isArray(value) ? value : [value];
+}
+
+function firstOf(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function toMinor(major: number | undefined): number | undefined {
+  return major === undefined ? undefined : toMinorUnits(major, siteConfig.currency);
 }
 
 function asNumber(value: string | string[] | undefined): number | undefined {
@@ -41,10 +52,16 @@ function parseSearchParams(searchParams: StorefrontSearchParams) {
   return {
     sizes: asArray(searchParams.size),
     colors: asArray(searchParams.color),
-    minPrice: asNumber(searchParams.minPrice),
-    maxPrice: asNumber(searchParams.maxPrice),
+    // The URL carries whole currency units (`?minPrice=2000` is ₹2,000) so a
+    // no-JS form submit lands on a correct URL and shared links stay readable.
+    // The catalogue query works in minor units, so convert on the way in.
+    minPrice: toMinor(asNumber(searchParams.minPrice)),
+    maxPrice: toMinor(asNumber(searchParams.maxPrice)),
     q: (Array.isArray(searchParams.q) ? searchParams.q[0] : searchParams.q)?.slice(0, 120),
     sort: sort as 'newest' | 'price-asc' | 'price-desc' | 'popular',
+    // Presence with the value "1" is the switch, so the URL stays short and an
+    // unchecked box leaves no trace in the address bar.
+    inStockOnly: firstOf(searchParams.inStock) === '1',
     page: asNumber(searchParams.page) ?? 1,
   };
 }
@@ -157,12 +174,16 @@ export async function ProductListing({
       </div>
 
       <div className="mt-8 flex gap-10">
-        <aside className="hidden w-56 shrink-0 lg:block">
+        <aside aria-label="Filters" className="hidden w-56 shrink-0 lg:block">
           <FilterPanel facets={facets} />
         </aside>
 
         <div className="min-w-0 flex-1">
-          <Suspense key={resultsKey} fallback={<ProductGridSkeleton count={8} />}>
+          {/*
+            The skeleton must hold as many cards as a full page, or every
+            filter change paints a short grid and then reflows to a tall one.
+          */}
+          <Suspense key={resultsKey} fallback={<ProductGridSkeleton count={DEFAULT_PAGE_SIZE} />}>
             <Results
               categoryPath={categoryPath}
               searchParams={searchParams}
