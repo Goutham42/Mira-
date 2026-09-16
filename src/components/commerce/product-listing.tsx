@@ -11,7 +11,10 @@ import { SearchSuggestions } from './search-suggestions';
 import { FilterPanel } from './filter-panel';
 import { MobileFilters } from './mobile-filters';
 import { Pagination } from './pagination';
-import { ProductGrid, ProductGridSkeleton } from './product-grid';
+import { ProductGridSkeleton } from './product-grid';
+import { CollectionGrid } from './collection-grid';
+import { LayoutControls } from './layout-controls';
+import { ListingPreferencesProvider } from './listing-preferences';
 import { SortSelect } from './sort-select';
 
 export type StorefrontSearchParams = Record<string, string | string[] | undefined>;
@@ -96,28 +99,32 @@ async function Results({
     );
   }
 
+  // Everything the load-more action needs to continue this exact query. `page`
+  // is left out because the grid advances it itself.
+  const { page: _page, ...query } = params;
+
   return (
     <>
       <p className="mb-6 text-sm text-muted-foreground" aria-live="polite">
         {result.total} product{result.total === 1 ? '' : 's'}
-        {result.totalPages > 1 ? (
-          <span className="text-subtle-foreground">
-            {' '}
-            · page {result.page} of {result.totalPages}
-          </span>
-        ) : null}
       </p>
 
-      <ProductGrid products={result.items} wishlistProductIds={wishlistIds} />
-
-      <div className="mt-14">
-        <Pagination
-          page={result.page}
-          totalPages={result.totalPages}
-          searchParams={searchParams}
-          basePath={basePath}
-        />
-      </div>
+      <CollectionGrid
+        initialItems={result.items}
+        initialWishlistIds={[...wishlistIds]}
+        query={{ ...query, categoryPath }}
+        initialPage={result.page}
+        totalPages={result.totalPages}
+        total={result.total}
+        paginationFallback={
+          <Pagination
+            page={result.page}
+            totalPages={result.totalPages}
+            searchParams={searchParams}
+            basePath={basePath}
+          />
+        }
+      />
     </>
   );
 }
@@ -148,7 +155,8 @@ export async function ProductListing({
   const resultsKey = JSON.stringify(searchParams);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <ListingPreferencesProvider>
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <header className="max-w-2xl">
         <h1 className="text-4xl">{heading}</h1>
         {description ? (
@@ -156,7 +164,12 @@ export async function ProductListing({
         ) : null}
       </header>
 
-      <div className="mt-10 flex items-center justify-between gap-4 border-b pb-4">
+      {/*
+        Pinned below the site header (h-18 / lg:h-20) so filters and sort stay
+        reachable deep into an infinitely scrolling grid — which is exactly
+        where a shopper is most likely to want to narrow down.
+      */}
+      <div className="sticky top-18 z-30 -mx-4 mt-10 flex items-center justify-between gap-4 border-b bg-background/95 px-4 py-4 backdrop-blur-md sm:-mx-6 sm:px-6 lg:top-20 lg:-mx-8 lg:px-8">
         <MobileFilters facets={facets}>
           <span className="inline-flex items-center gap-2 rounded-md border border-border-strong px-4 py-2 text-sm lg:hidden">
             <SlidersHorizontal className="size-4" />
@@ -164,7 +177,8 @@ export async function ProductListing({
           </span>
         </MobileFilters>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
+          <LayoutControls />
           <SortSelect value={params.sort} />
         </div>
       </div>
@@ -192,6 +206,7 @@ export async function ProductListing({
           </Suspense>
         </div>
       </div>
-    </div>
+      </div>
+    </ListingPreferencesProvider>
   );
 }
