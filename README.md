@@ -50,6 +50,8 @@ Incrementing `sessionVersion` signs out every existing session for that user.
 | `npm run typecheck` | `tsc --noEmit`                                 |
 | `npm run lint`      | ESLint                                        |
 | `npm test`          | Vitest unit tests                             |
+| `npm run test:e2e`  | Playwright end-to-end suite (builds, then drives a browser) |
+| `npm run test:e2e:ui` | The same suite in Playwright's interactive runner |
 | `npm run db:migrate`| Create/apply a migration in development       |
 | `npm run db:deploy` | Apply migrations in CI/production             |
 | `npm run db:seed`   | Seed development data                         |
@@ -212,10 +214,62 @@ balancer can drain the instance.
    stock is never blocked between runs. Vercel attaches
    `Authorization: Bearer $CRON_SECRET` automatically.
 
+## Testing
+
+Two suites, and they answer different questions.
+
+`npm test` runs Vitest over the pure logic — money arithmetic, pricing, slugs,
+rate limiting, email bodies. Fast, no database, no browser.
+
+`npm run test:e2e` runs Playwright against a production build and a real
+database. It signs in, browses, fills the bag, places a guest order, and then
+goes through the admin to record the payment, ship the parcel and mark it
+delivered. It covers what unit tests structurally cannot: that the pages
+render, that the Server Actions are wired to the right services, and that
+authorisation actually holds at the route.
+
+It needs a seeded development database and `SEED_ADMIN_PASSWORD` set, because
+it signs in as the seeded accounts. **It writes to whatever `DATABASE_URL`
+points at** — orders, shipments, discount codes. Never point it at production.
+
+```bash
+npm run db:seed
+npm run test:e2e
+```
+
+The first run builds the app, which takes a minute; `E2E_DEV=1 npm run test:e2e`
+drives `next dev` instead if you already have one running.
+
+If you want to keep working while the suite builds, give your dev server its
+own build directory — otherwise the build replaces files the running server is
+reading and Next fails with "Invariant: Expected clientReferenceManifest to be
+defined", which looks like an application bug and is not one:
+
+```bash
+NEXT_DIST_DIR=.next-dev npm run dev
+```
+
+## Observability
+
+Sentry is wired for the server, the browser and middleware, and is completely
+inert until `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` are set — no DSN means no
+network calls and no overhead, which is what you want locally. Reports are
+tunnelled through `/monitoring` so ad blockers do not swallow them, PII is off
+by default, and session replay is deliberately not enabled: it would record
+what shoppers type into the checkout.
+
+Page-view analytics come from `@vercel/analytics`. It is cookieless and
+first-party, so it needs no consent banner, and it sends nothing outside a
+Vercel deployment.
+
 ## Not built yet
 
 Deferred on purpose, and nothing in the schema blocks them: multi-currency and
-i18n, gift cards, product bundles, loyalty, returns/RMA portal, live carrier
-rates, Meilisearch, recommendations, review submission UI, transactional email
-delivery (tokens are currently logged), direct-to-Cloudinary image upload
-(product images take URLs for now), and a background job queue.
+i18n, gift cards, product bundles, loyalty, a customer-facing returns/RMA
+portal (staff can refund and restock from the admin today), live carrier rates,
+Meilisearch, recommendations, editorial `Collection`s beyond categories, the
+`Setting` table (shop configuration is environment-driven for now), and a
+background job queue.
+
+The one deliberate gap that blocks real trading is the **payment gateway** —
+see [Payments](#payments).

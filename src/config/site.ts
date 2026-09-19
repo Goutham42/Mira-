@@ -40,10 +40,10 @@ export const siteConfig = {
 
 /**
  * Page headlines.
- *
  * Collected here so the storefront's voice can be read — and changed — in one
  * sitting, instead of being scattered across a dozen page components.
  */
+
 export const headlines = {
   shop: {
     title: 'The whole collection',
@@ -101,6 +101,7 @@ export const footerNav = [
  * payment providers check for them during onboarding, and the grievance
  * officer named in the privacy policy has to be findable.
  */
+
 export const legalNav = [
   { title: 'Privacy', href: '/legal/privacy' },
   { title: 'Terms', href: '/legal/terms' },
@@ -113,5 +114,7 @@ export const adminNav = [
   { title: 'Products', href: '/admin/products', icon: 'Shirt' },
   { title: 'Categories', href: '/admin/categories', icon: 'FolderTree' },
   { title: 'Inventory', href: '/admin/inventory', icon: 'Boxes' },
+  { title: 'Reviews', href: '/admin/reviews', icon: 'Star' },
+  { title: 'Discounts', href: '/admin/discounts', icon: 'TicketPercent' },
   { title: 'Customers', href: '/admin/customers', icon: 'Users' },
 ] as const;

@@ -14,6 +14,7 @@ export type Permission =
   | 'order:read:any'
   | 'order:fulfill'
   | 'order:refund'
+  | 'review:moderate'
   | 'customer:read'
   | 'discount:write'
   | 'settings:write'
@@ -26,6 +27,7 @@ const STAFF_PERMISSIONS: Permission[] = [
   'inventory:write',
   'order:read:any',
   'order:fulfill',
+  'review:moderate',
   'customer:read',
 ];
 

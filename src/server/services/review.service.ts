@@ -1,9 +1,13 @@
 import 'server-only';
 import { revalidateTag, unstable_cache } from 'next/cache';
 
+import type { ReviewStatus } from '@prisma/client';
+
 import { db } from '@/server/db';
 import { conflict, notFound } from '@/server/errors';
-import { getCurrentUser, requireUser } from '@/server/auth/session';
+import { getCurrentUser, requirePermission, requireUser } from '@/server/auth/session';
+import { paginate, parsePageParams } from '@/lib/pagination';
+import { recordAudit } from './audit.service';
 import type {
   ProductReviewData,
   ReviewEligibility,
@@ -206,4 +210,165 @@ export async function getRatingsFor(
   }
 
   return ratings;
+}
+
+// ---------------------------------------------------------------------------
+// Moderation
+// ---------------------------------------------------------------------------
+
+/**
+ * A review as the moderation queue shows it.
+ *
+ * Unlike the storefront projection this carries the reviewer's real identity:
+ * staff deciding whether a review is genuine need to see who wrote it and
+ * whether they actually bought the piece.
+ */
+export type AdminReviewRow = {
+  id: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  status: ReviewStatus;
+  verifiedPurchase: boolean;
+  createdAt: Date;
+  author: { name: string; email: string };
+  product: { id: string; title: string; slug: string };
+};
+
+const adminReviewSelect = {
+  id: true,
+  rating: true,
+  title: true,
+  body: true,
+  status: true,
+  verifiedPurchase: true,
+  createdAt: true,
+  user: { select: { firstName: true, lastName: true, email: true } },
+  product: { select: { id: true, title: true, slug: true } },
+};
+
+function toAdminRow(row: {
+  id: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  status: ReviewStatus;
+  verifiedPurchase: boolean;
+  createdAt: Date;
+  user: { firstName: string | null; lastName: string | null; email: string };
+  product: { id: string; title: string; slug: string };
+}): AdminReviewRow {
+  const name = [row.user.firstName, row.user.lastName].filter(Boolean).join(' ').trim();
+  return {
+    id: row.id,
+    rating: row.rating,
+    title: row.title,
+    body: row.body,
+    status: row.status,
+    verifiedPurchase: row.verifiedPurchase,
+    createdAt: row.createdAt,
+    author: { name: name || '—', email: row.user.email },
+    product: row.product,
+  };
+}
+
+/**
+ * The moderation queue.
+ *
+ * Defaults to PENDING because that is the only tab with work in it; the other
+ * filters exist so a decision can be revisited rather than being final.
+ */
+export async function listReviewsForAdmin(
+  params: { status?: ReviewStatus | 'ALL'; page?: number } = {},
+) {
+  await requirePermission('review:moderate');
+
+  const page = parsePageParams(params.page, 20, 20);
+  const where =
+    !params.status || params.status === 'ALL' ? {} : { status: params.status };
+
+  const [rows, total] = await Promise.all([
+    db.productReview.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: page.skip,
+      take: page.take,
+      select: adminReviewSelect,
+    }),
+    db.productReview.count({ where }),
+  ]);
+
+  return paginate(rows.map(toAdminRow), total, page);
+}
+
+/** Badge count for the admin nav; cheap enough to run on every admin render. */
+export async function countPendingReviews(): Promise<number> {
+  await requirePermission('review:moderate');
+  return db.productReview.count({ where: { status: 'PENDING' } });
+}
+
+/**
+ * Approve or reject a review.
+ *
+ * Both directions invalidate the product's cached reviews — rejecting an
+ * already-approved review has to pull it off the storefront just as promptly
+ * as approving one puts it up.
+ */
+export async function moderateReview(
+  reviewId: string,
+  status: Extract<ReviewStatus, 'APPROVED' | 'REJECTED'>,
+): Promise<void> {
+  const actor = await requirePermission('review:moderate');
+
+  const review = await db.productReview.findUnique({
+    where: { id: reviewId },
+    select: { id: true, status: true, productId: true },
+  });
+  if (!review) throw notFound('Review');
+  if (review.status === status) return;
+
+  await db.productReview.update({ where: { id: reviewId }, data: { status } });
+
+  revalidateTag(reviewTag(review.productId));
+  revalidateTag(REVIEW_TAG);
+
+  await recordAudit({
+    actorId: actor.id,
+    action: 'review.moderate',
+    entityType: 'ProductReview',
+    entityId: reviewId,
+    before: { status: review.status },
+    after: { status },
+  });
+}
+
+/**
+ * Delete a review outright.
+ *
+ * Rejection hides a review but keeps the record, which is what you want for a
+ * genuine-but-unpublishable opinion. Deletion is for spam, and it frees the
+ * shopper to write a real review later — the unique constraint is per product
+ * and user, so the row has to go for that to be possible.
+ */
+export async function deleteReview(reviewId: string): Promise<void> {
+  const actor = await requirePermission('review:moderate');
+
+  const review = await db.productReview.findUnique({
+    where: { id: reviewId },
+    select: { id: true, productId: true, status: true },
+  });
+  if (!review) throw notFound('Review');
+
+  await db.productReview.delete({ where: { id: reviewId } });
+
+  revalidateTag(reviewTag(review.productId));
+  revalidateTag(REVIEW_TAG);
+
+  await recordAudit({
+    actorId: actor.id,
+    action: 'review.delete',
+    entityType: 'ProductReview',
+    entityId: reviewId,
+    before: { status: review.status },
+  });
 }

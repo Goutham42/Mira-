@@ -1,0 +1,115 @@
+# Checks that must pass before anything reaches main.
+#
+# Vercel already builds every push; what it does not do is run the tests or
+# fail the deploy when they break. This does.
+#
+# The end-to-end job brings up its own Postgres, migrates it and seeds it, so
+# it never touches a real database.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Placeholder values: every one of these is validated at boot by
+  # src/config/env.ts, and none of them is a real credential.
+  AUTH_SECRET: ci-auth-secret-value-that-is-long-enough-000
+  CRON_SECRET: ci-cron-secret-long-enough
+  APP_URL: http://localhost:3000
+  AUTH_URL: http://localhost:3000
+  NEXT_PUBLIC_APP_URL: http://localhost:3000
+  NEXT_PUBLIC_STORE_NAME: Mira
+  NEXT_PUBLIC_DEFAULT_CURRENCY: INR
+
+jobs:
+  static:
+    name: Lint, types and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx prisma generate
+
+      # No formatting gate yet: the repository is not Prettier-clean, and
+      # reformatting 140 files is a commit of its own rather than something to
+      # smuggle into CI. Run `npm run format` when you are ready to take it,
+      # then add `npx prettier --check .` here.
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Types
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+  e2e:
+    name: End-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: mira
+          POSTGRES_PASSWORD: mira
+          POSTGRES_DB: mira_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://mira:mira@localhost:5432/mira_test?schema=public
+      DIRECT_URL: postgresql://mira:mira@localhost:5432/mira_test?schema=public
+      SEED_ADMIN_EMAIL: admin@mira.example
+      SEED_ADMIN_PASSWORD: ci-seed-password-long-enough
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Migrate and seed
+        run: |
+          npx prisma migrate deploy
+          npm run db:seed
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the suite
+        run: npm run test:e2e
+
+      - name: Keep the report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

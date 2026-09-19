@@ -8,7 +8,9 @@ import {
   LayoutDashboard,
   Shirt,
   ShoppingBag,
+  Star,
   Store,
+  TicketPercent,
   Users,
 } from 'lucide-react';
 
@@ -21,6 +23,8 @@ const ICONS = {
   Shirt,
   FolderTree,
   Boxes,
+  Star,
+  TicketPercent,
   Users,
 } as const;
 

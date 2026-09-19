@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Poppins, Cormorant_Garamond, Sacramento } from 'next/font/google';
 import { Toaster } from 'sonner';
+import { Analytics } from '@vercel/analytics/next';
 
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
@@ -84,6 +85,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             },
           }}
         />
+        {/*
+          Page-view analytics. Cookieless and first-party, so it needs no
+          consent banner under GDPR/DPDP, and it is inert anywhere but a Vercel
+          deployment — local development sends nothing.
+        */}
+        <Analytics />
       </body>
     </html>
   );

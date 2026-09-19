@@ -1,5 +1,6 @@
 import 'server-only';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import type { UserRole, UserStatus } from '@prisma/client';
 
 import { db } from '@/server/db';
 import { badRequest, conflict, notFound } from '@/server/errors';
@@ -12,6 +13,7 @@ import { sendEmail } from '@/server/email/client';
 import { passwordResetTemplate, verifyEmailTemplate } from '@/server/email/templates';
 import type { RegisterInput } from '@/lib/validation/auth';
 import type { SaveAddressInput } from '@/lib/validation/address';
+import { recordAudit } from './audit.service';
 
 const TOKEN_TTL_MINUTES = 30;
 
@@ -380,4 +382,143 @@ export async function listCustomersForAdmin(params: { q?: string; page?: number 
   }));
 
   return paginate(items, total, page);
+}
+
+// ---------------------------------------------------------------------------
+// Account administration
+// ---------------------------------------------------------------------------
+
+/**
+ * Suspend or reinstate an account.
+ *
+ * Suspension has to take effect now, not at the next sign-in — a suspended
+ * shopper with a live JWT would otherwise keep ordering for the rest of the
+ * token's life. Bumping `sessionVersion` is what makes it immediate: the jwt
+ * callback re-checks the version and every existing session dies.
+ */
+export async function setUserStatus(userId: string, status: UserStatus): Promise<void> {
+  const actor = await requirePermission('user:manage');
+
+  const target = await db.user.findFirst({
+    where: { id: userId, deletedAt: null },
+    select: { id: true, email: true, role: true, status: true },
+  });
+  if (!target) throw notFound('Customer');
+  if (target.status === status) return;
+
+  if (target.id === actor.id && status !== 'ACTIVE') {
+    throw conflict('You cannot suspend your own account.');
+  }
+
+  if (status !== 'ACTIVE' && target.role === 'ADMIN') {
+    await assertNotLastAdmin(target.id);
+  }
+
+  await db.user.update({
+    where: { id: userId },
+    data: {
+      status,
+      // Reinstating does not need a bump; suspending and locking must.
+      ...(status === 'ACTIVE' ? {} : { sessionVersion: { increment: 1 } }),
+    },
+  });
+
+  await recordAudit({
+    actorId: actor.id,
+    action: status === 'ACTIVE' ? 'user.reinstate' : 'user.suspend',
+    entityType: 'User',
+    entityId: userId,
+    before: { status: target.status },
+    after: { status },
+  });
+}
+
+/**
+ * Change what someone is allowed to do.
+ *
+ * Role changes also revoke existing sessions: a demoted staff member holding a
+ * token minted with the old role would otherwise keep their admin access until
+ * it expired.
+ */
+export async function setUserRole(userId: string, role: UserRole): Promise<void> {
+  const actor = await requirePermission('user:manage');
+
+  const target = await db.user.findFirst({
+    where: { id: userId, deletedAt: null },
+    select: { id: true, email: true, role: true },
+  });
+  if (!target) throw notFound('Customer');
+  if (target.role === role) return;
+
+  if (target.id === actor.id && role !== 'ADMIN') {
+    throw conflict('You cannot remove your own admin access.');
+  }
+
+  if (target.role === 'ADMIN' && role !== 'ADMIN') {
+    await assertNotLastAdmin(target.id);
+  }
+
+  await db.user.update({
+    where: { id: userId },
+    data: { role, sessionVersion: { increment: 1 } },
+  });
+
+  await recordAudit({
+    actorId: actor.id,
+    action: 'user.role',
+    entityType: 'User',
+    entityId: userId,
+    before: { role: target.role },
+    after: { role },
+  });
+}
+
+/**
+ * Refuse to remove the last way into the admin.
+ *
+ * Without this, one careless demotion locks everybody out of the admin area
+ * for good — there is no "reset an admin" path that does not involve a
+ * database client.
+ */
+async function assertNotLastAdmin(excludingUserId: string): Promise<void> {
+  const remaining = await db.user.count({
+    where: {
+      role: 'ADMIN',
+      status: 'ACTIVE',
+      deletedAt: null,
+      NOT: { id: excludingUserId },
+    },
+  });
+
+  if (remaining === 0) {
+    throw conflict('This is the last active admin. Promote someone else first.');
+  }
+}
+
+/**
+ * Force a customer to sign in again everywhere.
+ *
+ * The blunt instrument for "their laptop was stolen" — no password change, no
+ * suspension, just every existing session invalidated.
+ */
+export async function revokeUserSessions(userId: string): Promise<void> {
+  const actor = await requirePermission('user:manage');
+
+  const target = await db.user.findFirst({
+    where: { id: userId, deletedAt: null },
+    select: { id: true },
+  });
+  if (!target) throw notFound('Customer');
+
+  await db.user.update({
+    where: { id: userId },
+    data: { sessionVersion: { increment: 1 } },
+  });
+
+  await recordAudit({
+    actorId: actor.id,
+    action: 'user.revoke-sessions',
+    entityType: 'User',
+    entityId: userId,
+  });
 }

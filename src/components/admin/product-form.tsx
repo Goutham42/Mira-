@@ -17,6 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { saveProductAction } from '@/actions/admin/catalog';
 import { toMinorUnits } from '@/lib/money';
+import { ImageUploadButton } from '@/components/admin/image-upload-button';
 import { slugify } from '@/lib/slug';
 import { siteConfig } from '@/config/site';
 
@@ -401,20 +402,27 @@ export function ProductForm({
       <section className="rounded-lg border bg-surface p-6">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-xl">Images</h2>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => imageFields.append({ url: '', alt: '', colorValue: '' })}
-          >
-            <Plus />
-            Add image
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <ImageUploadButton
+              label="Upload photo"
+              onUploaded={(url) => imageFields.append({ url, alt: '', colorValue: '' })}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => imageFields.append({ url: '', alt: '', colorValue: '' })}
+            >
+              <Plus />
+              Add URL
+            </Button>
+          </div>
         </div>
 
         {imageFields.fields.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            No images yet. The first image is used on product cards.
+            No images yet. Upload a photo, or paste the URL of one you host elsewhere. The
+            first image is used on product cards.
           </p>
         ) : (
           <ul className="mt-5 space-y-3">

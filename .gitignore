@@ -47,3 +47,10 @@ Thumbs.db
 
 # VS Code Local History extension — editor snapshots, not source
 .history/
+
+# Playwright
+tests/e2e/.auth/
+tests/e2e/.artifacts/
+
+# Alternate build dir used when a dev server runs alongside a build
+.next-dev/

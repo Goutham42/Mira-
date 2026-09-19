@@ -1,4 +1,9 @@
-import type { FulfillmentStatus, OrderStatus, PaymentStatus } from '@prisma/client';
+import type {
+  FulfillmentStatus,
+  OrderStatus,
+  PaymentStatus,
+  ShipmentStatus,
+} from '@prisma/client';
 
 export type OrderAddressSnapshot = {
   fullName: string;
@@ -44,6 +49,23 @@ export type OrderTimelineEntry = {
   createdAt: Date;
 };
 
+/**
+ * A parcel as the shopper sees it.
+ *
+ * Carries the tracking number as well as the link: carrier URLs rot, and a
+ * number can always be pasted into the carrier's own site.
+ */
+export type OrderShipmentView = {
+  id: string;
+  carrier: string | null;
+  trackingNumber: string | null;
+  trackingUrl: string | null;
+  status: ShipmentStatus;
+  shippedAt: Date | null;
+  deliveredAt: Date | null;
+  lines: { orderItemId: string; title: string; quantity: number }[];
+};
+
 export type OrderDetailView = OrderSummaryView & {
   email: string;
   phone: string | null;
@@ -55,6 +77,7 @@ export type OrderDetailView = OrderSummaryView & {
   billingAddress: OrderAddressSnapshot;
   customerNote: string | null;
   lines: OrderLineView[];
+  shipments: OrderShipmentView[];
   timeline: OrderTimelineEntry[];
   payment: {
     provider: string;

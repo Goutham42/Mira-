@@ -133,3 +133,107 @@ export function orderConfirmationTemplate(order: OrderConfirmationInput) {
     ].join('\n'),
   };
 }
+
+export type ShipmentNotificationInput = {
+  orderNumber: string;
+  carrier: string | null;
+  trackingNumber: string | null;
+  trackingUrl: string | null;
+  lines: { title: string; quantity: number }[];
+  partial: boolean;
+};
+
+/**
+ * "Your order is on its way."
+ *
+ * The tracking number is shown as text as well as linked: carrier links rot,
+ * and a shopper who can read the number can always paste it themselves.
+ */
+export function shipmentTemplate(input: ShipmentNotificationInput) {
+  const orderUrl = absoluteUrl(`/account/orders/${encodeURIComponent(input.orderNumber)}`);
+
+  const items = input.lines
+    .map(
+      (line) =>
+        `<tr><td style="padding:6px 0;font-size:14px">${escapeHtml(line.title)} &times; ${line.quantity}</td></tr>`,
+    )
+    .join('');
+
+  const trackingHtml = input.trackingNumber
+    ? `<p style="margin:0 0 8px;font-size:14px;line-height:1.6">
+         ${input.carrier ? `${escapeHtml(input.carrier)} &middot; ` : ''}Tracking number
+         <strong>${escapeHtml(input.trackingNumber)}</strong>
+       </p>`
+    : '';
+
+  return {
+    subject: input.partial
+      ? `Part of order ${input.orderNumber} has shipped`
+      : `Order ${input.orderNumber} has shipped`,
+    html: layout(
+      input.partial ? 'Part of your order is on its way' : 'Your order is on its way',
+      `<p style="margin:0 0 16px;font-size:14px;line-height:1.6">Order <strong>${escapeHtml(input.orderNumber)}</strong></p>
+       ${trackingHtml}
+       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #ece5db;margin:16px 0">${items}</table>
+       ${button(input.trackingUrl ?? orderUrl, input.trackingUrl ? 'Track your parcel' : 'View your order')}`,
+    ),
+    text: [
+      input.partial ? 'Part of your order is on its way.' : 'Your order is on its way.',
+      '',
+      `Order ${input.orderNumber}`,
+      input.trackingNumber
+        ? `${input.carrier ? `${input.carrier} · ` : ''}Tracking number: ${input.trackingNumber}`
+        : '',
+      input.trackingUrl ? `Track: ${input.trackingUrl}` : '',
+      '',
+      ...input.lines.map((line) => `${line.title} x ${line.quantity}`),
+      '',
+      `View your order: ${orderUrl}`,
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  };
+}
+
+export type RefundNotificationInput = {
+  orderNumber: string;
+  currency: string;
+  amount: number;
+  reason: string | null;
+  partial: boolean;
+};
+
+export function refundTemplate(input: RefundNotificationInput) {
+  const orderUrl = absoluteUrl(`/account/orders/${encodeURIComponent(input.orderNumber)}`);
+  const amount = formatMoney(input.amount, input.currency);
+
+  return {
+    subject: `Refund for order ${input.orderNumber}`,
+    html: layout(
+      input.partial ? 'A partial refund is on its way' : 'Your refund is on its way',
+      `<p style="margin:0 0 16px;font-size:14px;line-height:1.6">
+         We have refunded <strong>${escapeHtml(amount)}</strong> against order
+         <strong>${escapeHtml(input.orderNumber)}</strong>.
+       </p>
+       ${
+         input.reason
+           ? `<p style="margin:0 0 16px;font-size:14px;line-height:1.6">${escapeHtml(input.reason)}</p>`
+           : ''
+       }
+       <p style="margin:0 0 24px;font-size:14px;line-height:1.6">
+         Depending on your bank, it can take a few working days to appear on your statement.
+       </p>
+       ${button(orderUrl, 'View your order')}`,
+    ),
+    text: [
+      `We have refunded ${amount} against order ${input.orderNumber}.`,
+      input.reason ?? '',
+      '',
+      'Depending on your bank, it can take a few working days to appear on your statement.',
+      '',
+      `View your order: ${orderUrl}`,
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  };
+}

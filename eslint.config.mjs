@@ -15,6 +15,11 @@ const config = [
       'coverage/**',
       'next-env.d.ts',
       'src/generated/**',
+      // Editor snapshots from the VS Code Local History extension, not source.
+      '.history/**',
+      // Playwright's own output: traces, screenshots and saved sessions.
+      'tests/e2e/.artifacts/**',
+      'playwright-report/**',
     ],
   },
   ...compat.extends('next/core-web-vitals', 'next/typescript'),

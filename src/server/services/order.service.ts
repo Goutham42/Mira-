@@ -425,6 +425,24 @@ export async function getOrderDetail(orderNumber: string): Promise<OrderDetailVi
         },
       },
       events: { orderBy: { createdAt: 'asc' }, select: { id: true, type: true, message: true, createdAt: true } },
+      shipments: {
+        orderBy: { createdAt: 'asc' },
+        select: {
+          id: true,
+          carrier: true,
+          trackingNumber: true,
+          trackingUrl: true,
+          status: true,
+          shippedAt: true,
+          deliveredAt: true,
+          items: {
+            select: {
+              quantity: true,
+              orderItem: { select: { id: true, productTitle: true, variantTitle: true } },
+            },
+          },
+        },
+      },
       payments: {
         orderBy: { createdAt: 'desc' },
         take: 1,
@@ -466,6 +484,20 @@ export async function getOrderDetail(orderNumber: string): Promise<OrderDetailVi
       quantity: item.quantity,
       lineTotal: item.lineTotal,
       productSlug: item.variant?.product.slug ?? null,
+    })),
+    shipments: row.shipments.map((shipment) => ({
+      id: shipment.id,
+      carrier: shipment.carrier,
+      trackingNumber: shipment.trackingNumber,
+      trackingUrl: shipment.trackingUrl,
+      status: shipment.status,
+      shippedAt: shipment.shippedAt,
+      deliveredAt: shipment.deliveredAt,
+      lines: shipment.items.map((item) => ({
+        orderItemId: item.orderItem.id,
+        title: `${item.orderItem.productTitle} · ${item.orderItem.variantTitle}`,
+        quantity: item.quantity,
+      })),
     })),
     timeline: row.events,
     payment,

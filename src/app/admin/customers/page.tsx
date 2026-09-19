@@ -10,7 +10,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Pagination } from '@/components/commerce/pagination';
+import { CustomerActions } from '@/components/admin/customer-actions';
 import { listCustomersForAdmin } from '@/server/services/user.service';
+import { getCurrentUser } from '@/server/auth/session';
+import { hasPermission } from '@/server/auth/rbac';
 import { formatMoney } from '@/lib/money';
 import { siteConfig } from '@/config/site';
 
@@ -23,10 +26,13 @@ export default async function AdminCustomersPage({
 }) {
   const params = await searchParams;
 
-  const customers = await listCustomersForAdmin({
-    q: params.q,
-    page: Number(params.page) || 1,
-  });
+  const [customers, viewer] = await Promise.all([
+    listCustomersForAdmin({ q: params.q, page: Number(params.page) || 1 }),
+    getCurrentUser(),
+  ]);
+
+  // Staff can read the list; only an admin can act on an account.
+  const canManage = viewer ? hasPermission(viewer.role, 'user:manage') : false;
 
   const dateFormat = new Intl.DateTimeFormat(siteConfig.locale, { dateStyle: 'medium' });
 
@@ -61,12 +67,15 @@ export default async function AdminCustomersPage({
             <TableHead>Orders</TableHead>
             <TableHead>Lifetime spend</TableHead>
             <TableHead>Status</TableHead>
+            {canManage ? <TableHead className="w-12 text-right">Manage</TableHead> : null}
           </TableRow>
         </TableHeader>
 
         <TableBody>
           {customers.items.length === 0 ? (
-            <TableEmpty colSpan={5}>No customers match that search.</TableEmpty>
+            <TableEmpty colSpan={canManage ? 6 : 5}>
+              No customers match that search.
+            </TableEmpty>
           ) : (
             customers.items.map((customer) => (
               <TableRow key={customer.id}>
@@ -105,6 +114,18 @@ export default async function AdminCustomersPage({
                     ) : null}
                   </span>
                 </TableCell>
+
+                {canManage ? (
+                  <TableCell className="text-right">
+                    <CustomerActions
+                      userId={customer.id}
+                      email={customer.email}
+                      role={customer.role}
+                      status={customer.status}
+                      isSelf={customer.id === viewer?.id}
+                    />
+                  </TableCell>
+                ) : null}
               </TableRow>
             ))
           )}
