@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { cuid, minorAmount } from './common';
+import { cuid, minorAmount, optionalCuid } from './common';
 
 const optionValueSchema = z.object({
   value: z.string().trim().min(1).max(60),
@@ -17,7 +17,7 @@ const optionSchema = z.object({
 });
 
 const variantSchema = z.object({
-  id: cuid.optional(),
+  id: optionalCuid,
   sku: z
     .string()
     .trim()
@@ -142,7 +142,7 @@ export const inventoryAdjustmentSchema = z.object({
 });
 
 export const categorySchema = z.object({
-  id: cuid.optional(),
+  id: optionalCuid,
   name: z.string().trim().min(2, 'Name is required').max(80),
   slug: z
     .string()

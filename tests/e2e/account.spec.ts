@@ -15,6 +15,10 @@ test('the account pages all render', async ({ page }) => {
 });
 
 test('a shopper can save an address', async ({ page }) => {
+  // Unique per run: this account keeps every address it has ever saved, so a
+  // fixed street matches several cards on the second run.
+  const street = `${Date.now().toString().slice(-6)} Saved Street`;
+
   await page.goto('/account/addresses');
 
   const addButton = page.getByRole('button', { name: /add|new address/i }).first();
@@ -23,7 +27,7 @@ test('a shopper can save an address', async ({ page }) => {
   // The address book uses plain ids, unlike checkout's prefixed ones.
   await page.locator('#fullName').fill('E2E Address');
   await page.locator('#addressPhone').fill('9876543210');
-  await page.locator('#line1').fill('7 Saved Street');
+  await page.locator('#line1').fill(street);
   await page.locator('#city').fill('Coimbatore');
   await page.locator('#state').fill('Tamil Nadu');
   await page.locator('#postalCode').fill('641002');
@@ -32,12 +36,14 @@ test('a shopper can save an address', async ({ page }) => {
   await dialog.getByRole('button', { name: 'Save address' }).click();
 
   await expect(dialog).toHaveCount(0, { timeout: 20_000 });
-  await expect(page.getByText('7 Saved Street')).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(street)).toBeVisible({ timeout: 20_000 });
 });
 
 test('the wishlist accepts and releases a product', async ({ page }) => {
   await page.goto('/shop');
   await page.locator('a[href^="/p/"]').first().click();
+  // Without this the heading read below is still the shop's, not the product's.
+  await expect(page).toHaveURL(/\/p\//, { timeout: 15_000 });
 
   const title = await page.getByRole('heading', { level: 1 }).innerText();
 
@@ -54,6 +60,17 @@ test('the wishlist accepts and releases a product', async ({ page }) => {
 
   await page.goto('/account/wishlist');
   await expect(page.getByText(title.trim()).first()).toBeVisible({ timeout: 15_000 });
+});
+
+test('the admin area does not admit that it exists to a customer', async ({ page }) => {
+  await page.goto('/admin');
+
+  // Signed in but not staff: a 403 would confirm there is an admin here, so
+  // middleware rewrites to the storefront's not-found instead.
+  await expect(page.getByRole('heading', { name: /this page has moved on/i })).toBeVisible({
+    timeout: 15_000,
+  });
+  await expect(page.getByRole('navigation', { name: 'Admin' })).toHaveCount(0);
 });
 
 test('a shopper cannot open somebody else than their own order', async ({ page }) => {

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { cuid, minorAmount } from './common';
+import { minorAmount, optionalCuid } from './common';
 
 /**
  * Discount code rules.
@@ -24,7 +24,7 @@ const optionalCount = z
 
 export const discountSchema = z
   .object({
-    id: cuid.optional(),
+    id: optionalCuid,
     code: z
       .string()
       .trim()

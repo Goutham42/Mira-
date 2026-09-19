@@ -66,15 +66,14 @@ test('the legal pages are reachable and not empty', async ({ page }) => {
   }
 });
 
-test('the admin area is invisible to the public', async ({ page }) => {
-  const response = await page.goto('/admin');
+test('the admin area is closed to anyone signed out', async ({ page }) => {
+  await page.goto('/admin');
 
-  // Middleware rewrites to the storefront's not-found page rather than
-  // redirecting to a login, which would confirm the admin area exists.
-  await expect(page.getByRole('heading', { name: /this page has moved on/i })).toBeVisible({
-    timeout: 15_000,
-  });
-  // And none of the admin furniture leaks into it.
+  // Signed out, middleware sends you to sign in and remembers where you were
+  // going. (A signed-in customer gets a not-found instead, so that the admin
+  // area is not confirmed to exist — asserted in account.spec.ts, which has a
+  // customer session to do it with.)
+  await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  expect(page.url()).toContain('callbackUrl');
   await expect(page.getByRole('navigation', { name: 'Admin' })).toHaveCount(0);
-  expect(response?.status()).toBeLessThan(500);
 });

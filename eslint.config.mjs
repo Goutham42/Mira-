@@ -17,6 +17,8 @@ const config = [
       'src/generated/**',
       // Editor snapshots from the VS Code Local History extension, not source.
       '.history/**',
+      // The alternate build output used by NEXT_DIST_DIR; generated, not source.
+      '.next-dev/**',
       // Playwright's own output: traces, screenshots and saved sessions.
       'tests/e2e/.artifacts/**',
       'playwright-report/**',

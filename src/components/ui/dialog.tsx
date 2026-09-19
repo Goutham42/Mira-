@@ -26,6 +26,11 @@ function DialogContent({
         className={cn(
           'mira-pop fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2',
           'rounded-lg border bg-surface p-6 shadow-xl',
+          // A long form — the discount editor, the address form — is taller
+          // than a laptop viewport, and without these the submit button sits
+          // off-screen with no way to reach it. Caught by Playwright refusing
+          // to click an element "outside of the viewport".
+          'max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain',
           className,
         )}
         {...props}

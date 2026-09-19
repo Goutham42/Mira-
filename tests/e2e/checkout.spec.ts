@@ -44,7 +44,14 @@ test('a guest can put a dress in the bag and place an order', async ({ page }) =
   await shipping('postalCode').fill(address.postalCode);
 
   await page.getByRole('radio', { name: /cash on delivery/i }).click();
-  await page.locator('#acceptTerms').click();
+
+  // A Radix checkbox is a button with aria-checked, and a bare click on it is
+  // easy to lose. Assert the state rather than assume the click took — an
+  // unchecked box here fails with "Please accept the terms to continue", which
+  // is the form working correctly and the test being wrong.
+  const terms = page.getByRole('checkbox', { name: /i agree to the terms/i });
+  await terms.check();
+  await expect(terms).toBeChecked();
 
   await page.getByRole('button', { name: 'Place order' }).click();
 

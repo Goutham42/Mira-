@@ -99,6 +99,12 @@ export async function addFirstProductToBag(page: Page) {
 
     if (await selectBuyableVariant(page)) {
       await addToBagButton(page).click();
+
+      // Adding is a Server Action, and navigating away while it is in flight
+      // cancels it — which is how this test spent a run asserting against an
+      // empty bag. The success toast is the page's own signal that the server
+      // accepted it.
+      await expect(page.getByText('Added to your bag')).toBeVisible({ timeout: 20_000 });
       return;
     }
   }

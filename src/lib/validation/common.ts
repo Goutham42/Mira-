@@ -2,6 +2,20 @@ import { z } from 'zod';
 
 export const cuid = z.string().cuid();
 
+/**
+ * An id that may legitimately be absent.
+ *
+ * A create-or-edit form keeps the id in a hidden input, and a hidden input
+ * with no value reads back as `''`, not `undefined`. `cuid.optional()` rejects
+ * `''`, and because the field is hidden there is nowhere to render the error —
+ * so the form silently refuses to submit and the shopper sees nothing happen.
+ * Treating empty as absent is what the form actually means.
+ */
+export const optionalCuid = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  cuid.optional(),
+);
+
 export const email = z
   .string()
   .trim()

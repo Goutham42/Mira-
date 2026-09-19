@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { phone } from './common';
+import { optionalCuid, phone } from './common';
 
 export const addressSchema = z.object({
   fullName: z.string().trim().min(2, 'Enter the recipient name').max(120),
@@ -18,7 +18,7 @@ export const addressSchema = z.object({
 });
 
 export const saveAddressSchema = addressSchema.extend({
-  id: z.string().cuid().optional(),
+  id: optionalCuid,
   type: z.enum(['SHIPPING', 'BILLING']).default('SHIPPING'),
   isDefaultShipping: z.coerce.boolean().default(false),
   isDefaultBilling: z.coerce.boolean().default(false),
